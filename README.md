@@ -27,3 +27,5 @@ The client and backend microservices communicate using specific types of Nostr e
 ## Support the Project
 
 I am an independent developer from El Salvador, working a full-time job while building open-source applications. If you would like to support the project, you can make a donation to the following address:
+
+BC1QRZSUAC0N0KKWZS24RQ5P3NF0UH2ZPQ86ER55CS
