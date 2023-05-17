@@ -1,0 +1,3 @@
+export const LND_ENDPOINT = "YOUR LND ENDPOINT";
+export const RELAY_ENDPOINT = "YOUR RELAY";
+export const ADMINMAC = "YOUR ADMIN MAC PATH";

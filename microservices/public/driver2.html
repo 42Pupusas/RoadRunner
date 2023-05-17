@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://bitcoincore.tech/apps/bitcoinjs-ui/lib/bitcoinjs-lib.js"></script>
+    <script src="https://bundle.run/noble-secp256k1@1.2.14"></script>
+    <script src="https://bundle.run/browserify-cipher@1.0.1"></script>
+    <title>Driver - NostrRide</title>
+  </head>
+  <style>
+    body {
+      background-color: black;
+    }
+    .container {
+      display: flex;
+      padding: 3px;
+      justify-content: space-evenly;
+    }
+    .event {
+      color: whitesmoke;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .feed {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      color: whitesmoke;
+    }
+
+    .ride{
+      background-color: grey;
+      border-radius: 10px;
+      margin: 12px;
+      padding: 12px;
+    }
+
+    .passenger{
+      border-radius: 10px;
+      margin: 12px;
+      padding: 12px;
+    }
+  </style>
+  <body>
+    <div class="container">
+      <div class="feed">
+        <h2>People Looking for Rides</h2>
+        <div class="event" id="events"></div>
+      </div>
+      <div class="feed">
+        <h2>New Ride!</h2>
+        <div class="newRide" id="newRide"></div>
+      </div>
+    </div>
+    <script>
+      const { getSharedSecret, schnorr, utils } = nobleSecp256k1;
+      const crypto = window.crypto;
+      const sha256 = bitcoinjs.crypto.sha256;
+
+
+      const driver = {
+        privkey:
+          "69967db92aacdaf71609efdf47a96f4c43d45a7e7283e85b642df15498ca09ce",
+        pubkey:
+          "0a02f7dee3a99d232deeabc6acbf2d70cd89a2d508b723d8410744a453a216ed",
+        car: {
+          make: "BMW",
+          model: "i5",
+          year: 2005,
+          color: "red",
+          plateNumber: "435tgd",
+        },
+        lnaddress: "lnaddresssdgf4werfgw",
+        rating: 2.3,
+      };
+
+      const eventsDiv = document.getElementById("events");
+      const rideDiv = document.getElementById("newRide");
+      const relay = new WebSocket("ws://192.168.1.4:6969");
+
+      const timestamp = Math.floor(Date.now() / 1000);
+      const subId = bitcoinjs.ECPair.makeRandom().privateKey.toString("hex");
+      const subId2 = bitcoinjs.ECPair.makeRandom().privateKey.toString("hex");
+      const rideFilter = { kinds: [14020], since: timestamp - 120 };
+      const privateFilter = {
+        kinds: [4],
+        since: timestamp - 120,
+        "#p": [driver.pubkey],
+      };
+      relay.onopen = () => {
+        console.log(JSON.stringify(["REQ", subId, privateFilter]));
+        relay.send(JSON.stringify(["REQ", subId2, rideFilter]));
+        relay.send(JSON.stringify(["REQ", subId, privateFilter]));
+      };
+
+      relay.onmessage = (msg) => {
+        var [type, subId, wsevent] = JSON.parse(msg.data.toString());
+        var { kind, content, pubkey } = wsevent || {};
+
+        if (!wsevent) return;
+
+        if (kind == "14020") {
+          var rideData = JSON.parse(content);
+          // console.log(rideData);
+          const rideHolder = document.createElement("div");
+          rideHolder.className = "ride";
+
+          const ridePassenger = document.createElement("h2");
+          const rideFrom = document.createElement("p");
+          const rideTo = document.createElement("p");
+          const rideOffer = document.createElement("p");
+          ridePassenger.innerText = rideData.passengerPubkey.substring(0, 12);
+          rideFrom.innerText = `From: ${rideData.from}`;
+          rideTo.innerText = `To: ${rideData.to}`;
+          rideOffer.innerText = `$${rideData.priceOffer}`;
+
+          const rideAccept = document.createElement("button");
+          rideAccept.id = "accept-btn";
+          rideAccept.className = "accept-class";
+          rideAccept.innerText = "Offer a Ride";
+          rideAccept.addEventListener("click", async () => {
+            // Do something when the button is clicked
+
+            // console.log(rideData);
+
+            var counterOff = await createCounterOffer(
+              rideData.passengerPubkey,
+              rideData.priceOffer
+            );
+            console.log(counterOff);
+            relay.send(counterOff);
+          });
+          rideHolder.appendChild(ridePassenger);
+          rideHolder.appendChild(rideFrom);
+          rideHolder.appendChild(rideTo);
+          rideHolder.appendChild(rideOffer);
+          rideHolder.appendChild(rideAccept);
+
+          if (eventsDiv) {
+            eventsDiv.appendChild(rideHolder);
+          }
+        }
+
+        if (kind == "4") {
+          var decryptedMessage = JSON.parse(
+            decrypt(driver.privkey, pubkey, content)
+          );
+          // console.log(decryptedMessage);
+          
+          const acceptedHolder = document.createElement("div");
+          acceptedHolder.className = "passenger"
+
+          const acceptedPassenger = document.createElement("h2");
+          const acceptedLocation = document.createElement("p");
+          const acceptedMessage = document.createElement("p");
+
+          acceptedPassenger.innerText = `Passenger: ${decryptedMessage.passenger.substring(
+            0,
+            12
+          )} `;
+          acceptedLocation.innerText = `Is At: ${decryptedMessage.exactGeoTag} `;
+          acceptedMessage.innerText = `And says: ${decryptedMessage.message} `;
+          acceptedHolder.appendChild(acceptedPassenger);
+            acceptedHolder.appendChild(acceptedLocation);
+            acceptedHolder.appendChild(acceptedMessage);
+          if (rideDiv) {
+            rideDiv.appendChild(acceptedHolder);
+          }
+        }
+      };
+
+      async function createCounterOffer(passengerPubKey, offer) {
+        var counterOffer = offer * 1.3;
+        var message = JSON.stringify({
+          passenger: passengerPubKey,
+          driver: driver.pubkey,
+          car: JSON.stringify(driver.car),
+          counter: counterOffer,
+          btc: driver.lnaddress,
+        });
+        var encrypted = encrypt(driver.privkey, passengerPubKey, message);
+        var event = {
+          content: encrypted,
+          created_at: Math.floor(Date.now() / 1000),
+          kind: 14021,
+          tags: [["p", passengerPubKey]],
+          pubkey: driver.pubkey,
+        };
+        var signedEvent = await getSignedEvent(event, driver.privkey);
+        var nostrEvent = JSON.stringify(["EVENT", signedEvent]);
+        return nostrEvent;
+      }
+
+      async function getSignedEvent(event, privateKey) {
+        var eventData = JSON.stringify([
+          0, // Reserved for future use
+          event["pubkey"], // The sender's public key
+          event["created_at"], // Unix timestamp
+          event["kind"], // Message “kind” or type
+          event["tags"], // Tags identify replies/recipients
+          event["content"], // Your note contents
+        ]);
+        event.id = sha256(eventData).toString("hex");
+        event.sig = await schnorr.sign(event.id, privateKey);
+        return event;
+      }
+      function hexToBytes(hex) {
+        return Uint8Array.from(
+          hex.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+        );
+      }
+
+      function bytesToHex(bytes) {
+        return bytes.reduce(
+          (str, byte) => str + byte.toString(16).padStart(2, "0"),
+          ""
+        );
+      }
+      function base64ToHex(str) {
+        var raw = atob(str);
+        var result = "";
+        var i;
+        for (i = 0; i < raw.length; i++) {
+          var hex = raw.charCodeAt(i).toString(16);
+          result += hex.length === 2 ? hex : "0" + hex;
+        }
+        return result;
+      }
+      function encrypt(privkey, pubkey, text) {
+        var key = nobleSecp256k1
+          .getSharedSecret(privkey, "02" + pubkey, true)
+          .substring(2);
+        var iv = window.crypto.getRandomValues(new Uint8Array(16));
+        var cipher = browserifyCipher.createCipheriv(
+          "aes-256-cbc",
+          hexToBytes(key),
+          iv
+        );
+        var encryptedMessage = cipher.update(text, "utf8", "base64");
+        emsg = encryptedMessage + cipher.final("base64");
+        var uint8View = new Uint8Array(iv.buffer);
+        var decoder = new TextDecoder();
+        return emsg + "?iv=" + btoa(String.fromCharCode.apply(null, uint8View));
+      }
+      function decrypt(privkey, pubkey, ciphertext) {
+        var [emsg, iv] = ciphertext.split("?iv=");
+        var key = nobleSecp256k1
+          .getSharedSecret(privkey, "02" + pubkey, true)
+          .substring(2);
+        var decipher = browserifyCipher.createDecipheriv(
+          "aes-256-cbc",
+          hexToBytes(key),
+          hexToBytes(base64ToHex(iv))
+        );
+        var decryptedMessage = decipher.update(emsg, "base64");
+        dmsg = decryptedMessage + decipher.final("utf8");
+        return dmsg;
+      }
+    </script>
+  </body>
+</html>

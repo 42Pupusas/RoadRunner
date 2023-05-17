@@ -1,0 +1,85 @@
+# Compiled output
+dist/
+build/
+out/
+*.js
+
+# Dependency directories
+node_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-*
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Environment files
+.env
+
+# Build and package files
+*.d.ts
+*.map
+*.tar.gz
+*.tgz
+
+# Editor configuration
+.editorconfig
+
+# Mac-specific files
+.DS_Store
+
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# cypress
+cypress/screenshots
+cypress/videos
+
+# next.js
+/.next
+
+# next-sitemap
+public/robots.txt
+public/sitemap.xml
+public/sitemap-*.xml
+
+# cache
+.swc/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+Thumbs.db
+
+# debug
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# dotenv local files
+.env*.local
+
+# local folder
+local
+
+# vercel
+.vercel
