@@ -1,0 +1,47 @@
+@tailwind base;
+
+
+button {
+  @apply font-nexab text-xs m-2 rounded py-1 px-3 h-fit bg-white w-fit border border-dark 
+}
+input {
+  @apply font-nexab text-sm h-fit appearance-none bg-transparent border-b border-dark text-white placeholder:text-white leading-tight focus:outline-none
+}
+form {
+  @apply appearance-none
+}
+h2 {
+  @apply select-none text-dark text-lg font-nexab md:text-xl
+}
+h3 {
+  @apply select-none text-black font-nexab text-sm
+}
+h4 {
+  @apply select-none font-nexab text-white text-sm
+}
+main {
+  @apply p-12 h-screen sm:m-12
+}
+p {
+  @apply select-none text-text text-sm font-nexab sm:text-base
+}
+span {
+  @apply text-white font-nexab text-sm
+}
+svg {
+  @apply cursor-pointer
+}
+a > svg {
+  @apply w-6 h-6 text-white m-1 hover:text-light
+}
+@tailwind components;
+@tailwind utilities;
+@font-face {
+  font-family: "NexaBold";
+  src: url("./NexaBold.otf");
+}
+
+@font-face {
+  font-family: "Nexa";
+  src: url("./NexaLight.otf");
+}
