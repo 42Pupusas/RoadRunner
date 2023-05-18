@@ -3,6 +3,7 @@ dist/
 build/
 out/
 *.js
+.gitignore
 
 # Dependency directories
 node_modules/

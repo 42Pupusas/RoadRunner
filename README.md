@@ -1,6 +1,6 @@
 # Roadrunner
 
-Open source ride-sharing client hosted [here](https://roadrunner.lat), using Nostr and Lightning to implement a peer-2-peer, non-custodian solution to ride sharing. This repo is split into two branches, a React web client on the `client` branch, and the Node microservices on the `micro` branch.
+Open source ride-sharing client hosted [here](https://roadrunner.lat), using Nostr and Lightning to implement a peer-2-peer, non-custodian solution to ride sharing. This repo contains code for a React web client and the Node microservices.
 
 ## Web Client
 
