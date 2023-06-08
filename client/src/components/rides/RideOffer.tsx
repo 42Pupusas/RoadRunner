@@ -6,7 +6,7 @@ import { useContext, useRef, useState } from 'react';
 import { RideContext } from '@/components/utils/contextproviders/RideContext';
 import { UserContext } from '@/components/utils/contextproviders/UserContext';
 import { RELAY_URL } from '@/components/utils/Utils';
-import { PublicEvent } from '@/models/nostr/Public';
+import { NostrEvent } from '@/models/nostr/Event';
 
 const RideOffer = () => {
   const { ride } = useContext(RideContext)!;
@@ -41,14 +41,16 @@ const RideOffer = () => {
     });
     // Creamos un evento para enviar al servidor y crear un contrato
     // El tag [e] es el id de el viaje que queremos ofrecer
-    const newRideOffer = new PublicEvent(newOffer, 20010, currentUser, [
+    const newRideOffer = new NostrEvent(newOffer, 20010, currentUser.getPublicKey(), [
       ['e', ride?.getRideId()!],
     ]);
+
+    const signedRideOffer = currentUser.signEvent(newRideOffer);
 
     // Enviamos el evento al relay de Nostr
     const relayConnection = new WebSocket(RELAY_URL);
     relayConnection.onopen = async () => {
-      relayConnection.send(newRideOffer.getNostrMessage());
+      relayConnection.send(signedRideOffer.getNostrEvent());
       relayConnection.close();
       setSentOffer(true);
       setTimeout(() => {

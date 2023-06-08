@@ -30,6 +30,14 @@ Client and backend microservices communicate using specific kinds of Nostr event
 
 Any social client or dedicated app can integrate the backend services by using the same event kinds to contact the RoadRunner relay.
 
+## Roadmap
+
+Thanks to recent support from the [YakiHonne Hackathon](https://twitter.com/YakiHonne), we have funding available to continue development. The next features to be implemented will be:
+
+- Address lookup on maps
+- NIP-07 support
+- General UI/UX improvements
+
 ## Support the Project
 
 I am an independent dev from El Salvador working a full time job and building open source applications. Support this project by donating to:

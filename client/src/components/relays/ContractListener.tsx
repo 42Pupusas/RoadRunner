@@ -1,7 +1,6 @@
 import { useCallback, useContext, useEffect } from 'react';
 
 import { RELAY_URL } from '@/components/utils/Utils';
-import { PublicEvent } from '@/models/nostr/Public';
 import { Subscription } from '@/models/nostr/Subscription';
 import { Contract } from '@/models/roadrunner/Contract';
 
@@ -9,6 +8,7 @@ import { ContractContext } from '../utils/contextproviders/ContractContext';
 import OfferHistoryContext from '../utils/contextproviders/OfferHistoryContext';
 import { RideContext } from '../utils/contextproviders/RideContext';
 import { UserContext } from '../utils/contextproviders/UserContext';
+import { NostrEvent } from '@/models/nostr/Event';
 
 // Conexion del pasajero al relay de Nostr para recuperar contratos
 // Este componente se carga cuando agregamos un viaje al contexto
@@ -62,10 +62,11 @@ const ContractListener = () => {
     setOfferHistory([]);
 
     // Enviamos un viaje vacio para borrar el completo
-    const emptyRide = new PublicEvent('', 10420, currentUser!, []);
+    const emptyRide = new NostrEvent('', 10420, currentUser!.getPublicKey(), []);
+    const signedEmptyRide = currentUser!.signEvent(emptyRide);
     const relayConnection = new WebSocket(RELAY_URL);
     relayConnection.onopen = () => {
-      relayConnection.send(emptyRide.getNostrMessage());
+      relayConnection.send(signedEmptyRide.getNostrEvent());
       relayConnection.close();
     };
   }, [setRide]);
@@ -91,12 +92,12 @@ const ContractListener = () => {
       // Enviamos nuestra subscripcion
       relayConnection?.send(rideSubscription.getNostrEvent());
       // Inciamos un intervalo de latidos cada 30 segundos
-      const beat = new PublicEvent('thud', 20012, currentUser, [
+      const beat = new NostrEvent('thud', 20012, currentUser.getPublicKey(), [
         ['e', ride?.getRideId()],
       ]);
+      const signedBeat = currentUser.signEvent(beat);
       intervalId = setInterval(async () => {
-        const beatMsg = beat.getNostrMessage();
-        relayConnection.send(beatMsg);
+        relayConnection.send(signedBeat.getNostrEvent());
       }, 30000);
     };
     relayConnection.onmessage = async (msg) => {

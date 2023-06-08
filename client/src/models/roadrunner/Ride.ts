@@ -2,8 +2,8 @@ import type { LatLng } from 'leaflet';
 
 import { RELAY_URL } from '@/components/utils/Utils';
 
-import { PublicEvent } from '../nostr/Public';
 import type { User } from './User';
+import { NostrEvent } from '../nostr/Event';
 
 // Crea una instancia de un viaje posteado. Representa un evento posteado a Nostr y contiene la misma estructura.
 // El id queda vacio hasta que se manda el mensaje a Nostr, y se rellena con el id del evento de Nostr
@@ -89,11 +89,11 @@ export class Ride {
         to: this.to,
         price: this.price,
       });
-      const newNostrEvent = new PublicEvent(content, 10420, user, []);
-
+      const newNostrEvent = new NostrEvent(content, 10420, user.getPublicKey(), []);
+      const signedEvent = user.signEvent(newNostrEvent);
       const relayConnection = new WebSocket(RELAY_URL);
       relayConnection.onopen = () => {
-        relayConnection.send(newNostrEvent.getNostrMessage());
+        relayConnection.send(signedEvent.getNostrEvent());
         relayConnection.close();
         resolve(newNostrEvent.getNostrId());
       };

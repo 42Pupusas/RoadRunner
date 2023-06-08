@@ -1,7 +1,6 @@
 import { useCallback, useContext, useEffect } from 'react';
 
 import { RELAY_URL } from '@/components/utils/Utils';
-import { PublicEvent } from '@/models/nostr/Public';
 import { Subscription } from '@/models/nostr/Subscription';
 import { findRideById } from '@/models/relays/RideFinder';
 import { Contract } from '@/models/roadrunner/Contract';
@@ -10,6 +9,7 @@ import { ContractContext } from '../utils/contextproviders/ContractContext';
 import { RideContext } from '../utils/contextproviders/RideContext';
 import RideHistoryContext from '../utils/contextproviders/RideHistoryContext';
 import { UserContext } from '../utils/contextproviders/UserContext';
+import { NostrEvent } from '@/models/nostr/Event';
 
 // Conexion secundaria para conductores
 // Escucha contratos activos, si un contrato entra con estado "accepted", busca el viaje asociado y pasa ambos al contexto
@@ -70,12 +70,12 @@ const DriverContractListener = () => {
       // Enviamos nuestra subscripcion
       relayConnection?.send(rideSubscription.getNostrEvent());
       // Inciamos el intervalo de latidos cada 30 segundos
-      const beat = new PublicEvent('thud', 20012, currentUser, [
+      const beat = new NostrEvent('thud', 20012, currentUser.getPublicKey(), [
         ['p', currentUser.getPublicKey()],
       ]);
+      const signedBeat = currentUser.signEvent(beat);
       intervalId = setInterval(async () => {
-        const beatMsg = beat.getNostrMessage();
-        relayConnection.send(beatMsg);
+        relayConnection.send(signedBeat.getNostrEvent());
       }, 30000);
     };
     relayConnection.onmessage = async (msg) => {
@@ -93,6 +93,7 @@ const DriverContractListener = () => {
       // Si el contrato esta pagado o cancelado limpiamos contexto
       if (status === 'settled' || status === 'canceled') {
         updateFinishedRide();
+        return;
       }
       // Si el contrato esta aceptado pasamos el contrato al contexto
       if (status !== 'accepted') return;

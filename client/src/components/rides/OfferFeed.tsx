@@ -4,7 +4,6 @@ import QRCode from 'qrcode.react';
 import { useContext, useState } from 'react';
 
 import { stopPrepay } from '@/models/nostr/Htlc';
-import { PublicEvent } from '@/models/nostr/Public';
 import { findProfileByPublicKey } from '@/models/relays/RideFinder';
 import type { Profile } from '@/models/roadrunner/Profile';
 
@@ -13,6 +12,7 @@ import { getinvoiceAmount } from '../utils/Bolt11';
 import OfferHistoryContext from '../utils/contextproviders/OfferHistoryContext';
 import { UserContext } from '../utils/contextproviders/UserContext';
 import { RELAY_URL } from '../utils/Utils';
+import { NostrEvent } from '@/models/nostr/Event';
 
 const OfferFeed = () => {
   // El contexto de ofertas es un array de objetos, haremos un map de los objetos para crear ofertas
@@ -38,15 +38,16 @@ const OfferFeed = () => {
     });
     setOffer(offer);
 
-    const newPrepayReq = new PublicEvent(
+    const newPrepayReq = new NostrEvent(
       offer.contractId,
       20020,
-      currentUser!,
+      currentUser!.getPublicKey(),
       []
     );
+    const signedRequest = currentUser!.signEvent(newPrepayReq);
     const relayConnection = new WebSocket(RELAY_URL);
     relayConnection.onopen = async () => {
-      relayConnection.send(newPrepayReq.getNostrMessage());
+      relayConnection.send(signedRequest.getNostrEvent());
     };
   };
 

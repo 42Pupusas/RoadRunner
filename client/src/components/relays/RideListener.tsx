@@ -5,13 +5,13 @@ import { useCallback, useContext, useEffect } from 'react';
 import RideHistoryContext from '@/components/utils/contextproviders/RideHistoryContext';
 import { UserContext } from '@/components/utils/contextproviders/UserContext';
 import { RELAY_URL } from '@/components/utils/Utils';
-import { PublicEvent } from '@/models/nostr/Public';
 import { Subscription } from '@/models/nostr/Subscription';
 import { findMyContract, findRideById } from '@/models/relays/RideFinder';
 import { Ride } from '@/models/roadrunner/Ride';
 
 import { ContractContext } from '../utils/contextproviders/ContractContext';
 import { RideContext } from '../utils/contextproviders/RideContext';
+import { NostrEvent } from '@/models/nostr/Event';
 
 // Conexion principal para conductores, recupera eventos de viajes siendo publicados en tiempo real
 // La conexion se mantiene viva usando eventos de latidos
@@ -56,10 +56,12 @@ const RideListener = () => {
       // Enviamos nuestra subscripcion
       relayConnection?.send(rideSubscription.getNostrEvent());
       // Inciamos un intervalo que enviara latidos cada 30 segundos
-      const beat = new PublicEvent('thud', 20421, currentUser, []);
+      const beat = new NostrEvent('thud', 20012, currentUser.getPublicKey(), [
+        ['p', currentUser.getPublicKey()],
+      ]);
+      const signedBeat = currentUser.signEvent(beat);
       intervalId = setInterval(async () => {
-        const beatMsg = beat.getNostrMessage();
-        relayConnection.send(beatMsg);
+        relayConnection.send(signedBeat.getNostrEvent());
       }, 30000);
     };
     relayConnection.onmessage = (msg) => {

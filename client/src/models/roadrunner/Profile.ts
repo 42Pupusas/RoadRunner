@@ -1,8 +1,8 @@
 import { RELAY_URL } from '@/components/utils/Utils';
 
-import { PublicEvent } from '../nostr/Public';
 import { Subscription } from '../nostr/Subscription';
 import type { User } from './User';
+import { NostrEvent } from '../nostr/Event';
 
 export class Profile {
   private event: string | null;
@@ -40,12 +40,13 @@ export class Profile {
       avatar: this.avatar,
       carAvatar: this.carAvatar,
     });
-    const profileEvent = new PublicEvent(profileContent, 0, user, []);
+    const profileEvent = new NostrEvent(profileContent, 0, user.getPublicKey(), []);
+    const signedProfile = user.signEvent(profileEvent);
     const relayConnection = new WebSocket(RELAY_URL);
     if (!relayConnection) return;
 
     relayConnection.onopen = () => {
-      relayConnection?.send(profileEvent.getNostrMessage());
+      relayConnection?.send(signedProfile.getNostrEvent());
       relayConnection.close();
     };
   };
