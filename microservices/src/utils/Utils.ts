@@ -1,3 +1,4 @@
-export const LND_ENDPOINT = "YOUR LND ENDPOINT";
+export const LND_ENDPOINT = "https://lnd.roadrunner.lat";
 export const RELAY_ENDPOINT = "YOUR RELAY";
-export const ADMINMAC = "YOUR ADMIN MAC PATH";
+export const ADMINMAC = "/home/roadrunner/.lnd/data/chain/bitcoin/mainnet/invoice.macaroon";
+
