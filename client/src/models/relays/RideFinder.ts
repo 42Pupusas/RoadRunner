@@ -242,3 +242,26 @@ export const findRatingByPublicKey = async (
     };
   });
 };
+
+export const findGeocodeFromAddress = async (address: string) => {
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+    address
+  )}&format=json`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (Array.isArray(data) && data.length > 0) {
+      const { lat, lon } = data[0];
+      const latitude = parseFloat(lat);
+      const longitude = parseFloat(lon);
+      return { latitude, longitude };
+    } else {
+      throw new Error('No geocoding results found');
+    }
+  } catch (error) {
+    console.error('Error geocoding address:', error);
+    throw error;
+  }
+};

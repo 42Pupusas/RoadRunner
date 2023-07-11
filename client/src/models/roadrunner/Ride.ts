@@ -63,22 +63,22 @@ export class Ride {
     });
   }
 
-  // Calcula la distancia entre los dos puntos
   getDistanceInKm(): number {
     const R = 6371; // Earth's radius in kilometers
     const dLat = (this.from.lat - this.to.lat) * (Math.PI / 180);
     const dLon = (this.from.lng - this.to.lng) * (Math.PI / 180);
     const lat1 = this.from.lat * (Math.PI / 180);
-    const lat2 = this.from.lat * (Math.PI / 180);
-
+    const lat2 = this.to.lat * (Math.PI / 180); // Corrected line
+  
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = R * c;
-
     return distance;
   }
+  
+  
 
   // Envia el evento del viaje a Nostr y establece el id del viaje
   sendRideRequest(user: User): Promise<string> {
