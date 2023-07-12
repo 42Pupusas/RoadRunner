@@ -75,8 +75,6 @@ function RideForm() {
       }, 2000); // display error message for 3 seconds
       return;
     }
-    console.log(rideFrom.current);
-    console.log(rideTo.current);
     // Creamos un nuevo objeto de viaje
     const newRide = new Ride(
       currentUser.getPublicKey(),
@@ -84,7 +82,6 @@ function RideForm() {
       rideTo.current,
       rideOffer
     );
-    console.log(newRide);
     // Enviamos el viaje al relay de Nostr
     newRide.sendRideRequest(currentUser).then((rideId) => {
       newRide.setRideID(rideId);

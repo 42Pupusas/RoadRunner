@@ -16,7 +16,7 @@ const RideOffer = () => {
   const [userError, setUserError] = useState<boolean>(false);
   const [sentOffer, setSentOffer] = useState<boolean>(false);
 
-  function offerRide() {
+  async function offerRide() {
     // Validamos que el usuario este logueado
     if (!currentUser) {
       setUserError(true);
@@ -45,11 +45,12 @@ const RideOffer = () => {
       ['e', ride?.getRideId()!],
     ]);
 
-    const signedRideOffer = currentUser.signEvent(newRideOffer);
+    const signedRideOffer = await currentUser.signEvent(newRideOffer);
 
     // Enviamos el evento al relay de Nostr
     const relayConnection = new WebSocket(RELAY_URL);
     relayConnection.onopen = async () => {
+      console.log('Sending offer', signedRideOffer.getNostrEvent());
       relayConnection.send(signedRideOffer.getNostrEvent());
       relayConnection.close();
       setSentOffer(true);

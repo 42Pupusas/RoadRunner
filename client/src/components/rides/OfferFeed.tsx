@@ -27,7 +27,7 @@ const OfferFeed = () => {
   const [currentDriver, setDriver] = useState<Profile | null>(null);
   // Mostramos el recibo del servidor y generamos un QR
   // Tambien notificamos al servidor para que empieze a escuchar el contrato
-  const prepayDriverUI = (offer: {
+  const prepayDriverUI = async (offer: {
     invoice: string;
     driver: string;
     contractId: string;
@@ -44,7 +44,7 @@ const OfferFeed = () => {
       currentUser!.getPublicKey(),
       []
     );
-    const signedRequest = currentUser!.signEvent(newPrepayReq);
+    const signedRequest = await currentUser!.signEvent(newPrepayReq);
     const relayConnection = new WebSocket(RELAY_URL);
     relayConnection.onopen = async () => {
       relayConnection.send(signedRequest.getNostrEvent());

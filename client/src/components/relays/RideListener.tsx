@@ -52,21 +52,23 @@ const RideListener = () => {
     const relayConnection = new WebSocket(RELAY_URL);
     if (!relayConnection) return () => {};
     let intervalId: NodeJS.Timer;
-    relayConnection.onopen = () => {
+    relayConnection.onopen = async () => {
       // Enviamos nuestra subscripcion
       relayConnection?.send(rideSubscription.getNostrEvent());
       // Inciamos un intervalo que enviara latidos cada 30 segundos
       const beat = new NostrEvent('thud', 20012, currentUser.getPublicKey(), [
         ['p', currentUser.getPublicKey()],
       ]);
-      const signedBeat = currentUser.signEvent(beat);
+      const signedBeat = await currentUser.signEvent(beat);
       intervalId = setInterval(async () => {
         relayConnection.send(signedBeat.getNostrEvent());
       }, 30000);
     };
     relayConnection.onmessage = (msg) => {
+      console.log(msg);
       const [type, , nostrEvent] = JSON.parse(msg.data);
       // Filtramos eventos de mantenimiento "OPEN", "EOSE"
+      console.log(nostrEvent);
       if (type !== 'EVENT') return;
       const { content, kind, id } = nostrEvent;
       // Los latidos los ignoramos

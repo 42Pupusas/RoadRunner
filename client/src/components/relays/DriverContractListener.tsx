@@ -61,19 +61,20 @@ const DriverContractListener = () => {
       kinds: [4200, 20012],
       '#p': [currentUser.getPublicKey()],
       since: timestamp,
+      limit:1,
     });
     // Conectamos al relay Nostr
     const relayConnection = new WebSocket(RELAY_URL);
     if (!relayConnection) return () => {};
     let intervalId: NodeJS.Timer;
-    relayConnection.onopen = () => {
+    relayConnection.onopen = async () => {
       // Enviamos nuestra subscripcion
       relayConnection?.send(rideSubscription.getNostrEvent());
       // Inciamos el intervalo de latidos cada 30 segundos
       const beat = new NostrEvent('thud', 20012, currentUser.getPublicKey(), [
         ['p', currentUser.getPublicKey()],
       ]);
-      const signedBeat = currentUser.signEvent(beat);
+      const signedBeat: NostrEvent = await currentUser.signEvent(beat);
       intervalId = setInterval(async () => {
         relayConnection.send(signedBeat.getNostrEvent());
       }, 30000);

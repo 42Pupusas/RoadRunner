@@ -18,6 +18,7 @@ const RideFeed = () => {
   const { rideHistory } = useContext(RideHistoryContext)!;
 
   const setNewRide = (rideinput: Ride) => {
+    console.log(rideinput);
     if (ride?.getUserPublicKey() === rideinput.getUserPublicKey()) {
       setRide(null);
     } else {

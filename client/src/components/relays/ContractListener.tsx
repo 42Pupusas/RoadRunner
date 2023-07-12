@@ -63,7 +63,7 @@ const ContractListener = () => {
 
     // Enviamos un viaje vacio para borrar el completo
     const emptyRide = new NostrEvent('', 10420, currentUser!.getPublicKey(), []);
-    const signedEmptyRide = currentUser!.signEvent(emptyRide);
+    const signedEmptyRide: NostrEvent = await currentUser!.signEvent(emptyRide);
     const relayConnection = new WebSocket(RELAY_URL);
     relayConnection.onopen = () => {
       relayConnection.send(signedEmptyRide.getNostrEvent());
@@ -88,19 +88,20 @@ const ContractListener = () => {
     const relayConnection = new WebSocket(RELAY_URL);
     if (!relayConnection) return () => {};
     let intervalId: NodeJS.Timer;
-    relayConnection.onopen = () => {
+    relayConnection.onopen = async () => {
       // Enviamos nuestra subscripcion
       relayConnection?.send(rideSubscription.getNostrEvent());
       // Inciamos un intervalo de latidos cada 30 segundos
       const beat = new NostrEvent('thud', 20012, currentUser.getPublicKey(), [
         ['e', ride?.getRideId()],
       ]);
-      const signedBeat = currentUser.signEvent(beat);
+      const signedBeat: NostrEvent = await currentUser.signEvent(beat);
       intervalId = setInterval(async () => {
         relayConnection.send(signedBeat.getNostrEvent());
       }, 30000);
     };
     relayConnection.onmessage = async (msg) => {
+      console.log(msg);
       const [type, , nostrEvent] = JSON.parse(msg.data);
       // Filtramos eventos de servicio 'OPEN' y 'EOSE'
       if (type !== 'EVENT') return;
