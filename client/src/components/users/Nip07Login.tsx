@@ -13,8 +13,10 @@ const NostrLoginButton = () => {
     };
 
   return (
-    <button onClick={fetchNostr}>
-      Log in with NIP-07 Extension
+    <button 
+    className="block w-full select-none rounded-lg bg-gradient-to-tr  py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-dark shadow-md shadow--500/20 transition-all hover:shadow-lg hover:shadow-dark active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+    onClick={fetchNostr}>
+      Sign in with NIP-07 Extension
     </button>
   );
 };

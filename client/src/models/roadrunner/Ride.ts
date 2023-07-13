@@ -82,7 +82,7 @@ export class Ride {
 
   // Envia el evento del viaje a Nostr y establece el id del viaje
   sendRideRequest(user: User): Promise<string> {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       const content = JSON.stringify({
         passenger: this.passenger,
         from: this.from,
@@ -90,9 +90,10 @@ export class Ride {
         price: this.price,
       });
       const newNostrEvent = new NostrEvent(content, 10420, user.getPublicKey(), []);
-      const signedEvent = user.signEvent(newNostrEvent);
+      const signedEvent: NostrEvent = await user.signEvent(newNostrEvent);
       const relayConnection = new WebSocket(RELAY_URL);
-      relayConnection.onopen = () => {
+      relayConnection.onopen = async () => {
+        console.log('Sending ride request to Nostr', signedEvent.getNostrEvent());
         relayConnection.send(signedEvent.getNostrEvent());
         relayConnection.close();
         resolve(newNostrEvent.getNostrId());

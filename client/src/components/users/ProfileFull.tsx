@@ -1,9 +1,9 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from "react";
 
-import { findProfileByPublicKey } from '@/models/relays/RideFinder';
-import type { Profile } from '@/models/roadrunner/Profile';
+import { findProfileByPublicKey } from "@/models/relays/RideFinder";
+import type { Profile } from "@/models/roadrunner/Profile";
 
-import { UserContext } from '../utils/contextproviders/UserContext';
+import { UserContext } from "../utils/contextproviders/UserContext";
 
 export const ProfileFull = () => {
   const { user } = useContext(UserContext)!;
@@ -24,33 +24,31 @@ export const ProfileFull = () => {
 
   return (
     <>
-      {profile ? (
-        <>
-          <div className="flex flex-row">
-            <h2 className="mr-4 w-36 text-base">
-              Welcome back {profile.getUsername()}!
-            </h2>
-            {profile.getAvatar() ? (
+      <div className="relative flex max-w-[12rem] flex-col rounded-xl bg-white bg-clip-border  shadow-md">
+        <div className="relative m-0 overflow-hidden rounded-none bg-transparent bg-clip-border shadow-none">
+          <img src={profile?.getAvatar()!} alt="car avatar" />
+        </div>
+        <div className="p-2">
+          <p className="mt-3 block text-sm text-dark leading-relaxed antialiased">
+            Welcome back {profile?.getUsername()!}!
+          </p>
+        </div>
+        {profile?.getCar() ? (
+          <div className="flex items-center justify-evenly p-2">
+            <div className="flex items-center space-x-3">
               <img
-                className="h-12 w-12 rounded-full"
-                src={profile.getAvatar()!}
-                alt="Profile Image"
-              />
-            ) : null}
-          </div>
-          <div className="flex flex-row">
-            <h2 className="mr-4 w-36 text-base">{profile.getCar()}</h2>
-
-            {profile.getCarAvatar() ? (
-              <img
-                className="h-12 w-12 rounded-full"
+                alt="profile picture"
                 src={profile.getCarAvatar()!}
-                alt="Car Image"
+                className="h-9 w-9 rounded-full border-2 border-light object-cover object-center hover:z-10"
+                data-tooltip-target="author-1"
               />
-            ) : null}
+              <p className="text-sm font-medium text-dark">
+                {profile?.getCar()!}
+              </p>
+            </div>
           </div>
-        </>
-      ) : null}
+        ) : null}
+      </div>
     </>
   );
 };

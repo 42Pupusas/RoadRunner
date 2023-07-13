@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { findRatingByPublicKey } from '@/models/relays/RideFinder';
-import type { Profile } from '@/models/roadrunner/Profile';
+import { findRatingByPublicKey } from "@/models/relays/RideFinder";
+import type { Profile } from "@/models/roadrunner/Profile";
 
 interface ProfileCardProps {
   className?: string;
@@ -48,14 +48,24 @@ export const PassengerProfileCard = (props: ProfileCardProps) => {
   return (
     <>
       <div className={className}>
-        <div className="space-y-2 rounded-lg bg-light p-2 opacity-90">
-          <h3 className="font-nexab text-base">{profile.getUsername()}</h3>
-          {rating ? <h4>{rating}</h4> : <h4>Loading...</h4>}
-          <img
-            className="h-24 w-24 rounded-full"
-            src={profile.getAvatar()!}
-            alt="Profile Image"
-          />
+        <div className="relative p-2 flex w-full max-w-[26rem] flex-col rounded-xl bg-light bg-clip-border shadow-none">
+          <div className="relative flex items-center gap-4 overflow-hidden rounded-xl bg-transparent bg-clip-border shadow-none">
+            <img
+              src={profile.getAvatar()!}
+              alt="tania andrew"
+              className="relative inline-block h-[58px] w-[58px] !rounded-full object-cover object-center"
+            />
+            <div className="flex w-full flex-col gap-0.5">
+            <h2 className="mb-2 block font-semibold leading-snug tracking-normal text-white text-base antialiased">
+                {profile.getUsername()}
+              </h2>
+              <div className="flex items-center justify-between">
+                <h5 className="block font-sans text-xl font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased">
+                  {rating ? <h4>{rating} stars</h4> : <h4>Loading...</h4>}
+                </h5>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </>

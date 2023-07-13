@@ -33,7 +33,7 @@ export class Profile {
     this.event = event;
   }
 
-  public publishProfileEvent = (user: User): void => {
+  public publishProfileEvent = async (user: User): Promise<void> => {
     const profileContent = JSON.stringify({
       username: this.username,
       car: this.car,
@@ -41,7 +41,7 @@ export class Profile {
       carAvatar: this.carAvatar,
     });
     const profileEvent = new NostrEvent(profileContent, 0, user.getPublicKey(), []);
-    const signedProfile = user.signEvent(profileEvent);
+    const signedProfile = await user.signEvent(profileEvent);
     const relayConnection = new WebSocket(RELAY_URL);
     if (!relayConnection) return;
 

@@ -1,18 +1,18 @@
-import { faBoltLightning, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import QRCode from 'qrcode.react';
-import { useContext, useState } from 'react';
+import { faBoltLightning, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import QRCode from "qrcode.react";
+import { useContext, useState } from "react";
 
-import { stopPrepay } from '@/models/nostr/Htlc';
-import { findProfileByPublicKey } from '@/models/relays/RideFinder';
-import type { Profile } from '@/models/roadrunner/Profile';
+import { stopPrepay } from "@/models/nostr/Htlc";
+import { findProfileByPublicKey } from "@/models/relays/RideFinder";
+import type { Profile } from "@/models/roadrunner/Profile";
 
-import { DriverProfileCard } from '../users/ProfileCard';
-import { getinvoiceAmount } from '../utils/Bolt11';
-import OfferHistoryContext from '../utils/contextproviders/OfferHistoryContext';
-import { UserContext } from '../utils/contextproviders/UserContext';
-import { RELAY_URL } from '../utils/Utils';
-import { NostrEvent } from '@/models/nostr/Event';
+import { DriverProfileCard } from "../users/ProfileCard";
+import { getinvoiceAmount } from "../utils/Bolt11";
+import OfferHistoryContext from "../utils/contextproviders/OfferHistoryContext";
+import { UserContext } from "../utils/contextproviders/UserContext";
+import { RELAY_URL } from "../utils/Utils";
+import { NostrEvent } from "@/models/nostr/Event";
 
 const OfferFeed = () => {
   // El contexto de ofertas es un array de objetos, haremos un map de los objetos para crear ofertas
@@ -56,33 +56,43 @@ const OfferFeed = () => {
   return (
     <>
       {offerHistory.length > 0 ? (
-        <div className="fixed bottom-0 z-[1000000] my-4  rounded-lg bg-light p-2 opacity-90">
-          <h2 className="text-white">Driver Offers</h2>
-          <table className="table max-h-48 border-separate space-y-6 divide-y-2 divide-x-2 overflow-scroll text-sm text-white">
-            <thead className="text-left font-nexab text-black">
-              <tr className="p-1">
-                <th>Driver</th>
-                <th>Offer (sats)</th>
-              </tr>
-            </thead>
-            <tbody className=" p-2 text-center font-nexab">
-              {offerHistory.map((offer, idx) => (
-                <tr className="" key={idx}>
-                  <td className="uppercase">{offer.driver.substring(0, 8)}</td>
+        <div className="fixed bottom-0 left-0 m-4 flex items-center justify-center z-10">
+          <div className=" flex flex-col items-center justify-center  rounded-lg opacity-90 space-y-4">
+            <div className="flex w-72 flex-col justify-center rounded-xl bg-light bg-clip-border text-white shadow-md">
+              <div className="p-2 space-y-2">
+                <h2 className="mb-2 block font-semibold leading-snug tracking-normal text-white text-base antialiased">
+                  Driver Offers
+                </h2>
+                <table className="table max-h-48 border-separate space-y-6 divide-y-2 divide-x-2 overflow-scroll text-sm text-white">
+                  <thead className="text-left font-nexab text-black">
+                    <tr className="p-1">
+                      <th>Driver</th>
+                      <th>Offer (sats)</th>
+                    </tr>
+                  </thead>
+                  <tbody className=" p-2 text-center font-nexab">
+                    {offerHistory.map((offer, idx) => (
+                      <tr className="" key={idx}>
+                        <td className="uppercase">
+                          {offer.driver.substring(0, 8)}
+                        </td>
 
-                  <td> {getinvoiceAmount(offer.htlc)}</td>
+                        <td> {getinvoiceAmount(offer.htlc)}</td>
 
-                  <td>
-                    <FontAwesomeIcon
-                      icon={faBoltLightning}
-                      onClick={() => prepayDriverUI(offer)}
-                      className="inline-block h-4 w-4 cursor-pointer rounded-full bg-white p-1 text-light hover:bg-dark"
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                        <td>
+                          <FontAwesomeIcon
+                            icon={faBoltLightning}
+                            onClick={() => prepayDriverUI(offer)}
+                            className="inline-block h-4 w-4 cursor-pointer rounded-full bg-white p-1 text-light hover:bg-dark"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       ) : null}
       {currentOffer ? (

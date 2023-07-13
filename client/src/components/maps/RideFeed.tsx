@@ -1,17 +1,17 @@
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
-import 'leaflet-defaulticon-compatibility';
+import "leaflet/dist/leaflet.css";
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+import "leaflet-defaulticon-compatibility";
 
-import { faFlag } from '@fortawesome/free-regular-svg-icons';
-import { faFlagCheckered } from '@fortawesome/free-solid-svg-icons';
-import React, { useContext } from 'react';
-import { MapContainer, Marker, TileLayer, ZoomControl } from 'react-leaflet';
+import { faFlag } from "@fortawesome/free-regular-svg-icons";
+import { faFlagCheckered } from "@fortawesome/free-solid-svg-icons";
+import React, { useContext } from "react";
+import { MapContainer, Marker, TileLayer, ZoomControl } from "react-leaflet";
 
-import { createFontAwesomeIcon } from '@/models/roadrunner/AwesomeIcon';
-import type { Ride } from '@/models/roadrunner/Ride';
+import { createFontAwesomeIcon } from "@/models/roadrunner/AwesomeIcon";
+import type { Ride } from "@/models/roadrunner/Ride";
 
-import { RideContext } from '../utils/contextproviders/RideContext';
-import RideHistoryContext from '../utils/contextproviders/RideHistoryContext';
+import { RideContext } from "../utils/contextproviders/RideContext";
+import RideHistoryContext from "../utils/contextproviders/RideHistoryContext";
 
 const RideFeed = () => {
   const { ride, setRide } = useContext(RideContext)!;
@@ -29,18 +29,29 @@ const RideFeed = () => {
   // marcadores para el mapa, bandera vacia para incio con cuadros para final
   const startFlag = createFontAwesomeIcon({
     icon: faFlag,
-    style: { color: '#2C9464' },
+    style: { color: "#2C9464" },
   });
 
   const endFlag = createFontAwesomeIcon({
     icon: faFlagCheckered,
-    style: { color: '#1E4531' },
+    style: { color: "#1E4531" },
   });
+
   return (
     <>
-      <div className="fixed z-[100000] w-2/3 rounded-lg  bg-light p-2 opacity-90 sm:w-fit">
-        <h2 className="text-white">Nearby Rides</h2>
-        <span className="text-sm ">Offer a ride using a LN invoice!</span>
+      <div className="fixed top-0 ml-16 mt-4 flex items-center justify-center z-10">
+        <div className="flex flex-col items-center justify-center rounded-lg opacity-90">
+          <div className="flex w-72 flex-col justify-center rounded-xl bg-light bg-clip-border text-white shadow-md">
+            <div className="p-2">
+              <h2 className="mb-2 block font-semibold leading-snug tracking-normal text-white text-base antialiased">
+                Nearby Rides
+              </h2>
+              <p className="block font-nexa text-sm font-light leading-relaxed text-inherit antialiased">
+                Offer a ride using a LN invoice!
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
       <div className="fixed inset-0">
         <MapContainer
@@ -48,7 +59,7 @@ const RideFeed = () => {
           zoom={10}
           scrollWheelZoom={true}
           zoomControl={false}
-          style={{ width: '100%', height: '100%' }}
+          style={{ width: "100%", height: "100%" }}
           maxZoom={13}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />

@@ -13,11 +13,7 @@ class MyDocument extends Document {
         <body>
           <Main />
           <NextScript />
-          <img
-            className="fixed bottom-36 right-0 -z-10 h-1/2 rounded-full p-8 opacity-25 sm:opacity-100"
-            src="/logo/logorr.png"
-            alt="RoadRunner Logo"
-          />
+         
         </body>
       </Html>
     );

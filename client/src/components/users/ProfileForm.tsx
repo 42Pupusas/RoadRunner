@@ -28,15 +28,15 @@ export const ProfileForm = () => {
   };
 
   return (
-    <>
+    <div className="flex flex-col items-center justify-center m-4 space-y-4">
       <h2>Edit Profile</h2>
-      <p>
+      <p className="">
         Keep in mind a new profile event is created every time, no data is
         persisted from the old one!
       </p>
       <br />
-      <div className="flex flex-row">
-        <div className="mr-4">
+      <div className="flex flex-row space-x-4">
+        <div>
           <h3>Username</h3>
           <input
             className="text-black placeholder:text-black"
@@ -68,6 +68,6 @@ export const ProfileForm = () => {
           onClick={createProfile}
         />
       </div>
-    </>
+    </div>
   );
 };

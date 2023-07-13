@@ -1,16 +1,16 @@
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useContext, useEffect, useState } from 'react';
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useContext, useEffect, useState } from "react";
 
-import { cancelPayment } from '@/models/nostr/Htlc';
-import { findProfileByPublicKey } from '@/models/relays/RideFinder';
-import type { Profile } from '@/models/roadrunner/Profile';
+import { cancelPayment } from "@/models/nostr/Htlc";
+import { findProfileByPublicKey } from "@/models/relays/RideFinder";
+import type { Profile } from "@/models/roadrunner/Profile";
 
-import { PassengerProfileCard } from '../users/ProfileCard';
-import { getinvoiceAmount } from '../utils/Bolt11';
-import { ContractContext } from '../utils/contextproviders/ContractContext';
-import { RideContext } from '../utils/contextproviders/RideContext';
-import { UserContext } from '../utils/contextproviders/UserContext';
+import { PassengerProfileCard } from "../users/ProfileCard";
+import { getinvoiceAmount } from "../utils/Bolt11";
+import { ContractContext } from "../utils/contextproviders/ContractContext";
+import { RideContext } from "../utils/contextproviders/RideContext";
+import { UserContext } from "../utils/contextproviders/UserContext";
 
 export const AcceptedRideDetails = () => {
   const { contract } = useContext(ContractContext)!;
@@ -29,34 +29,51 @@ export const AcceptedRideDetails = () => {
 
   return (
     <>
-      <div className="fixed top-0 z-[1000000] my-8 rounded-lg bg-light p-2">
-        <h2 className="text-white">Accepted Ride</h2>
-        <span className="text-base">Go pick up your passenger!</span>
+      <div className="fixed top-0 ml-16 mt-4 flex items-center justify-center z-10">
+        <div className="flex flex-col items-center justify-center rounded-lg opacity-90">
+          <div className="flex w-72 flex-col justify-center rounded-xl bg-light bg-clip-border text-white shadow-md">
+            <div className="p-2">
+              <h2 className="mb-2 block font-semibold leading-snug tracking-normal text-white text-base antialiased">
+                Accepted Ride
+              </h2>
+              <p className="block font-nexa text-sm font-light leading-relaxed text-inherit antialiased">
+                Go pick up your passenger!
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="fixed bottom-16 z-[1000001] m-2 rounded bg-light p-2">
-        <div className="mr-8 inline-block">
-          <h3 className="">Distance</h3>
-          <span>{ride?.getDistanceInKm().toFixed(2)} kms</span>
-        </div>
-        <div className="inline-block">
-          <h3>Your Payment</h3>
-          <span> {getinvoiceAmount(contract?.getInvoice()!)} sats</span>
-        </div>
-        <div className="justify-start">
-          <h3>Passenger</h3>
-          <h4 className="uppercase">
-            {ride?.getUserPublicKey().substring(0, 12)}
-          </h4>
+
+      <div className="fixed bottom-4 ml-4  flex items-center justify-center z-10">
+        <div className="flex flex-col items-center justify-center rounded-lg opacity-90">
+          <div className="flex w-72 flex-col justify-center rounded-xl bg-light bg-clip-border text-white shadow-md">
+            <div className="p-2">
+              <div className="mr-8 inline-block">
+                <h3 className="">Distance</h3>
+                <span>{ride?.getDistanceInKm().toFixed(2)} kms</span>
+              </div>
+              <div className="inline-block">
+                <h3>Your Payment</h3>
+                <span> {getinvoiceAmount(contract?.getInvoice()!)} sats</span>
+              </div>
+              <div className="justify-start">
+                <h3>Passenger</h3>
+                <h4 className="uppercase">
+                  {ride?.getUserPublicKey().substring(0, 12)}
+                </h4>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <FontAwesomeIcon
         icon={faXmark}
-        className="fixed top-0 right-0 m-2 h-5 w-5 rounded-full bg-red-700 p-2 text-white hover:cursor-pointer"
+        className="fixed top-14 left-0 z-[1000000] m-4 h-6 w-6 cursor-pointer rounded-full bg-red-700 p-2 font-bold text-white hover:bg-red-800"
         onClick={() => cancelPayment(contract?.getInvoice()!, currentUser)}
       />
       {profile ? (
         <PassengerProfileCard
-          className="fixed top-48 z-[1000001] m-2"
+          className="fixed bottom-36 z-[1000001] ml-4"
           profile={profile}
         />
       ) : null}

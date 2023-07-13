@@ -1,6 +1,5 @@
 import React from 'react';
 
-import CreateKeys from '@/components/users/CreateKeys';
 import { ProfileForm } from '@/components/users/ProfileForm';
 
 function Settings() {
@@ -9,11 +8,8 @@ function Settings() {
       <div>
         <title>Settings - RoadRunner</title>
       </div>
-      <div>
+      <div className="flex flex-col items-center justify-center m-4">
         <ProfileForm />
-        <br />
-        <br />
-        <CreateKeys />
       </div>
     </>
   );

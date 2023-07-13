@@ -4,9 +4,7 @@
 button {
   @apply font-nexab text-xs m-2 rounded py-1 px-3 h-fit bg-white w-fit border border-dark 
 }
-input {
-  @apply font-nexab text-sm h-fit appearance-none bg-transparent border-b border-dark text-white placeholder:text-white leading-tight focus:outline-none
-}
+
 form {
   @apply appearance-none
 }
@@ -20,13 +18,13 @@ h4 {
   @apply select-none font-nexab text-white text-sm
 }
 main {
-  @apply p-12 h-screen sm:m-12
+  @apply p-2 h-screen w-screen
 }
 p {
   @apply select-none text-text text-sm font-nexab sm:text-base
 }
 span {
-  @apply text-white font-nexab text-sm
+  @apply text-white font-nexa text-sm
 }
 svg {
   @apply cursor-pointer

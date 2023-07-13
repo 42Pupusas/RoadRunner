@@ -6,9 +6,9 @@ import { NostrEvent } from './Event';
 // Metodos para notificar al servidor sobre acciones del contrato
 
 // Detiene el trabajador escuchando el contrato
-export const stopPrepay = (htlc: string, user: User): void => {
+export const stopPrepay = async (htlc: string, user: User): Promise<void> => {
   const newPrepayReq = new NostrEvent(htlc, 20021, user.getPublicKey(), []);
-  const signedRequest = user.signEvent(newPrepayReq);
+  const signedRequest = await user.signEvent(newPrepayReq);
   const relayConnection = new WebSocket(RELAY_URL);
   relayConnection.onopen = async () => {
     relayConnection.send(signedRequest.getNostrEvent());
@@ -16,9 +16,9 @@ export const stopPrepay = (htlc: string, user: User): void => {
 };
 
 // Paga al conductor para completar el viaje
-export const payDriver = (invoice: string, user: User): void => {
+export const payDriver = async (invoice: string, user: User): Promise<void> => {
   const newPayReq = new NostrEvent(invoice, 20022, user.getPublicKey(), []);
-  const signedRequest = user.signEvent(newPayReq);
+  const signedRequest = await user.signEvent(newPayReq);
   const relayConnection = new WebSocket(RELAY_URL);
   relayConnection.onopen = async () => {
     relayConnection.send(signedRequest.getNostrEvent());
@@ -26,9 +26,9 @@ export const payDriver = (invoice: string, user: User): void => {
 };
 
 // Cancela el contrato, este metodo puede ser usado por conductor o pasajero
-export const cancelPayment = (htlc: string, user: User): void => {
+export const cancelPayment = async (htlc: string, user: User): Promise<void> => {
   const newCancelReq = new NostrEvent(htlc, 20023, user.getPublicKey(), []);
-  const signedRequest = user.signEvent(newCancelReq);
+  const signedRequest = await user.signEvent(newCancelReq);
   const relayConnection = new WebSocket(RELAY_URL);
   relayConnection.onopen = async () => {
     relayConnection.send(signedRequest.getNostrEvent());

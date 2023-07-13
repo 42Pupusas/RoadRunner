@@ -107,7 +107,7 @@ const RideListener = () => {
     <>
       <FontAwesomeIcon
         icon={faArrowsRotate}
-        className="fixed  top-0 right-0 z-[1000000] m-2 h-5 w-5 cursor-pointer rounded-full bg-light p-2 text-white hover:bg-dark"
+        className="fixed  top-14 left-0 z-[1000000] m-4 h-6 w-6 cursor-pointer rounded-full bg-light p-2 text-white hover:bg-dark"
         onClick={() => {
           findAcceptedRide();
         }}

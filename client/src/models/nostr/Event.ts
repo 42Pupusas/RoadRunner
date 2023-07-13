@@ -2,7 +2,7 @@
 export class NostrEvent {
     private content: string;
   
-    private pubkey: string;
+    public pubkey: string;
   
     private tags: [string[]] | [];
   
@@ -10,9 +10,9 @@ export class NostrEvent {
   
     private kind: number;
   
-    public id: string | null;
+    public id: string;
   
-    public sig: string | null;
+    public sig: string;
   
     constructor(
       content: string,
@@ -24,8 +24,8 @@ export class NostrEvent {
       this.content = content;
       this.kind = kind;
       this.tags = tags;
-      this.id = null;
-      this.sig = null;
+      this.id = "";
+      this.sig = "";
     }
   
     serializeEvent(): string {
