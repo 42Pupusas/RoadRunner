@@ -8,10 +8,6 @@ MVP of a ride sharing service, designed to be device and browser agnostic. No in
 
 Client is in charge of aggregating ride requests and allowing drivetrs to offer LN invoices to the server for HTLC creation. Displays offers for users, retrieves invoice status events and allows users to send cancellation events. Aggregates profile and reputation events.
 
-### Key management
-
-As no key management extensions have been implemented yet, you should create a unique key for testing of this service. Key generation tools are available within the webpage [here](https://roadrunner.lat/settings/), but you are welcome to use your own keygen tools.  
-
 ## Microservices
 
 Two independent bots are running on the server, listening for user events on the relay. Each bot holds a copy of a private key, so users can identify backend events by the server public key. This also allows other clients to tag these microservices, effectively turning the Nostr relay into a public API.
@@ -32,11 +28,25 @@ Any social client or dedicated app can integrate the backend services by using t
 
 ## Roadmap
 
-Thanks to recent support from the [YakiHonne Hackathon](https://twitter.com/YakiHonne), we have funding available to continue development. The next features to be implemented will be:
+The client has the follwoing steps to continue improving:
 
-- Address lookup on maps
-- NIP-07 support
-- General UI/UX improvements
+- Continue UI/UX improvements
+- Implement Chat option between peers
+- Review rating aggregation
+
+We also plan to refactor all microservices to a more robust language (Rust).
+
+## Backers
+
+We have received the following grants and donations to continue development:
+
+### YakiHonne Hackathon
+
+RoadRunner has achieved 2nd place in the [YakiHonne](https://yakihonne.com/) Nostr Hack-A-Thon. We continue to participate in further rounds, so you can show your support [here](https://dorahacks.io/buidl/4976).
+
+### Baltic Sea Circle Rally Fundraiser
+
+[Daktari](https://twitter.com/MaunaLion) and [Cercatrova](https://twitter.com/cercatrova_21) organized an amazing fundraiser for several BTC related projects and we are proud to have received a generous donation from them to continue development. Learn more about the fundraiser [here](https://twitter.com/cercatrova_21/status/1675940788541222918).
 
 ## Support the Project
 
