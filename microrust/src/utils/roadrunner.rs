@@ -1,12 +1,14 @@
 use base64::{engine::general_purpose, Engine};
-use futures_util::{SinkExt, StreamExt};
 use lightning_invoice::Invoice;
 use serde::{Deserialize, Serialize};
-use serde_json::{json, from_str, Value};
-use tokio_tungstenite::{connect_async, tungstenite::Message};
+use serde_json::{json, from_str};
+use tokio_tungstenite::tungstenite::Message;
 
-use crate::{lnd::get_htlc_invoice, models::{secrets::RELAY_URL, nostr::{NostrSubscription, SignedNote, Note}, server::ServerBot}};
-
+use tokio::sync::mpsc;
+use crate::{lnd::{get_htlc_invoice, LndWebSocket}, models::{
+    nostr::{SignedNote, Note, NostrRelay}, 
+    server::ServerBot, 
+    lightning::HTLCStreamResult}};
 
 #[derive(Serialize, Deserialize)]
 pub struct DriverOffer {
@@ -15,13 +17,13 @@ pub struct DriverOffer {
     pub passenger: String,
 }
 
-
 #[derive(Serialize, Deserialize)]
 pub struct PassengerRequest{
     pub invoice: String,
     pub htlc: String,
     pub status: String,
-} 
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RideContract {
     ride: String,
@@ -41,7 +43,7 @@ impl RideContract {
         invoice: String,
         htlc: Option<String>,
         id: Option<String>,
-    ) -> Self {
+        ) -> Self {
         RideContract {
             ride,
             passenger,
@@ -52,7 +54,7 @@ impl RideContract {
         }
     }
 
-    fn get_invoice(&self) -> &str {
+    pub fn get_invoice(&self) -> &str {
         &self.invoice
     }
 
@@ -69,7 +71,7 @@ impl RideContract {
         }
     }
 
-    pub fn get_invoice_base64(&self) -> Result<String, &str> {
+    fn get_invoice_base64(&self) -> Result<String, &str> {
         match str::parse::<Invoice>(self.get_invoice()) {
             Ok(invoice) => {
                 let r_hash_safe = general_purpose::URL_SAFE.encode(invoice.signable_hash());
@@ -97,7 +99,7 @@ impl RideContract {
         }
     }
 
-    pub fn get_nostr_note(&self, status: String) -> Note {
+    pub fn get_nostr_note(&self, status: &str) -> Note {
         let offer_object = json!({
             "htlc": self.htlc.as_ref(),
             "invoice": self.invoice,
@@ -107,54 +109,47 @@ impl RideContract {
         let nostr_note = Note::new(
             ServerBot::new().get_public_key(),
             vec![
-                vec!['p'.to_string(), self.passenger.clone()],
-                vec!['e'.to_string(), self.ride.clone()],
-                vec!['p'.to_string(), self.driver.clone()],
+            vec!['p'.to_string(), self.passenger.clone()],
+            vec!['e'.to_string(), self.ride.clone()],
+            vec!['p'.to_string(), self.driver.clone()],
             ],
             4200 as u32,
             offer_object.to_string(),
-        );
+            );
 
         nostr_note
     }
 
     pub async fn find_contract(id: String) -> Self {
-        let url = url::Url::parse(RELAY_URL).unwrap();
-
-        // Connect to the server
-        let (ws_stream, _) = connect_async(url).await.expect("Failed to connect");
-        println!("Connected to the server");
-
-        // Split the WebSocket into a sender and receiver half
-        let (mut write, mut read) = ws_stream.split();
-
-        // Create prompt filters
+        let mut contract_ws = NostrRelay::new().await;
         let prompt_filters = json!({ "ids": [id] });
-
-        write
-            .send(NostrSubscription::new(prompt_filters))
-            .await
-            .expect("Failed to send JSON");
-
-        match read.next().await {
+        contract_ws.subscribe(prompt_filters).await.expect("Failed to subscribe");
+        match contract_ws.read_notes().await {
             Some(message) => match message {
                 Ok(Message::Text(message)) => {
-                    if let Ok((_type, _id, note)) = from_str::<(String, String, Value)>(&message) {
-                        let nostr_note = SignedNote::read_new(note).unwrap_or_else(|e| {
-                            println!("Error reading note: {:?}", e);
-                            panic!();
-                        });
-                        println!("Found nostr contract: {}", nostr_note.content);
-                        match from_str::<PassengerRequest>(&nostr_note.content) {
+                    if let Ok((_type, _id, note)) = from_str::<(String, String, SignedNote)>(&message) {
+                        println!("Found nostr contract: {}", note.id);
+                        match from_str::<PassengerRequest>(&note.content) {
                             Ok(passenger_note) => {
-                                return  RideContract::new(
-                                    nostr_note.tags[0][1].clone(),
-                                    nostr_note.tags[1][1].clone(),
-                                    nostr_note.tags[2][1].clone(),
-                                    passenger_note.invoice,
-                                    Some(passenger_note.htlc),
-                                    Some(nostr_note.id.clone()),
-                                );
+                                match contract_ws.close().await {
+
+                                    Ok(_) => {
+                                        println!("Closed contract websocket");
+                                        return  RideContract::new(
+                                            note.tags[0][1].clone(),
+                                            note.tags[1][1].clone(),
+                                            note.tags[2][1].clone(),
+                                            passenger_note.invoice,
+                                            Some(passenger_note.htlc),
+                                            Some(note.id.clone()),
+                                            );
+                                    }
+                                    Err(_e) => {
+                                        println!("Error closing websocket");
+                                        panic!();
+                                    }
+                                }
+
                             }
                             Err(_e) => {
                                 println!("Error reading Driver Offer");
@@ -178,4 +173,120 @@ impl RideContract {
         }
     }
 
+
+    pub async fn handle_ride_payments(&self) -> Result<(), Box<dyn std::error::Error>> {
+        let mut peers_ws = NostrRelay::new().await;
+
+        // Create prompt filters
+        let prompt_filters = json!({ "kinds": [20021, 20022, 20023] });
+        peers_ws.subscribe(prompt_filters).await.expect("Failed to subscribe");
+
+        let base64 = self.get_invoice_base64().unwrap();
+        println!("hash base64: {}", base64);
+        let (tx, mut rx) = mpsc::channel::<String>(10);
+        let mut contract_ws = LndWebSocket::new(self.get_invoice_base64().unwrap()).await;
+
+        let tx_clone = tx.clone();
+
+        tokio::spawn(async move {
+            loop {
+                match contract_ws.read_invoice_states().await {
+                    Some(Ok(Message::Text(result))) => {
+                        match from_str::<HTLCStreamResult>(&result) {
+                            Ok(htlc_result) => {
+                                println!("Invoice State is {:?}", htlc_result.result.state);
+                            }
+                            Err(e) => {
+                                println!("Error reading invoice result: {:?}", e);
+                            }
+                        }
+                    }
+                    Some(Ok(e)) => {
+                        println!("LND is Waiting for payment, {:?}", e);
+                    }
+                    Some(Err(e)) => {
+                        println!("Error with LND stream: {:?}", e);
+                        panic!();
+                    }
+                    None => {
+                        println!("Error reading invoice states");
+                        panic!();
+                    }
+                }
+
+                if let Ok(msg) = rx.try_recv() {
+                    if msg == "close" {
+                        if let Err(e) = contract_ws.close().await {
+                            println!("Error closing websocket: {:?}", e);
+                            panic!();
+                        }
+                    } else if msg == "done" {
+                        println!("Exiting from receiver loop");
+                        break;
+                    }
+                }
+
+                tokio::task::yield_now().await;
+            }
+        });
+
+        tokio::spawn(async move {
+            loop {
+                match peers_ws.read_notes().await {
+                    Some(Ok(Message::Text(message))) => {
+                        if let Ok((_type, _id, note)) = from_str::<(String, String, SignedNote)>(&message) {
+                            if note.kind == 20021 {
+                                println!("Peer contacted us with kind: {}", note.kind);
+                                peers_ws.close().await.unwrap_or_else(|e| {
+                                    println!("Error peers websocket: {:?}", e);
+                                    panic!();
+                                });
+                                println!("Closed peering websocket");
+                                if let Err(e) = tx_clone.try_send("close".to_string()) {
+                                    match e {
+                                        tokio::sync::mpsc::error::TrySendError::Closed(_) => {
+                                            println!("Channel is closed. Skipping message: {:?}", e);
+                                        }
+                                        tokio::sync::mpsc::error::TrySendError::Full(_) => {
+                                            println!("Channel is full. Skipping message: {:?}", e);
+                                        }
+                                    }
+                                }
+                                if let Err(e) = tx_clone.try_send("done".to_string()) {
+                                    match e {
+                                        tokio::sync::mpsc::error::TrySendError::Closed(_) => {
+                                            println!("Channel is closed. Skipping message: {:?}", e);
+                                        }
+                                        tokio::sync::mpsc::error::TrySendError::Full(_) => {
+                                            println!("Channel is full. Skipping message: {:?}", e);
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        } else if let Ok((notice, id)) = from_str::<(String, String)>(&message) {
+                            println!("Relay notice {} for {}", notice, id);
+                        }
+                    }
+                    Some(Ok(_)) => {
+                        println!("Error reading message");
+                        panic!();
+                    }
+
+                    Some(Err(_)) => {
+                        println!("Error reading message");
+                        panic!();
+                    }
+                    None => {
+                        println!("Error reading message");
+                        panic!();
+                    }
+                }
+
+                tokio::task::yield_now().await;
+            }
+        });
+
+        Ok(())
+    }
 }

@@ -25,13 +25,11 @@ impl ServerBot {
     pub fn sign_nostr_event(&self, event: Note) -> SignedNote {
         // Serialize the event as JSON
         let json_str = event.serialize_for_nostr();
-        println!("json_str: {:?}", json_str);
         // Compute the SHA256 hash of the serialized JSON string
         let mut hasher = Sha256::new();
         hasher.update(json_str);
         let hash_result = hasher.finalize();
         let id = hex::encode(hash_result);
-        println!("id: {:?}", id);
         let secp = Secp256k1::new();
 
         let id_message = Message::from_slice(&hash_result).unwrap();
@@ -39,7 +37,6 @@ impl ServerBot {
         let sig = secp
             .sign_schnorr_no_aux_rand(&id_message, &self.keypair)
             .to_string();
-        println!("sig: {:?}", sig);
         let signed_event = SignedNote {
             id,
             pubkey: self.get_public_key(),
@@ -49,9 +46,6 @@ impl ServerBot {
             content: event.content,
             sig,
         };
-
-        println!("signed_event: {:?}", signed_event.prepare_ws_message());
-
         signed_event
     }
 }

@@ -1,61 +1,47 @@
-use async_recursion::async_recursion;
-use futures_util::{SinkExt, StreamExt};
-use serde_json::{from_str, json, Value};
-use tokio_tungstenite::{connect_async, tungstenite::Message};
-use utils::{models::{
-    nostr::{NostrSubscription, SignedNote},
-    secrets::RELAY_URL,
-    server::ServerBot,
-}, roadrunner::RideContract};
+use serde_json::{from_str, json};
+use tokio_tungstenite::tungstenite::Message;
+use utils::{models::nostr::{SignedNote, NostrRelay}, roadrunner::RideContract};
+
 
 #[tokio::main]
 async fn main() {
-    connect_and_reconnect().await;
-}
 
-#[async_recursion]
-async fn connect_and_reconnect() {
-    // Parse URL address into URL struct
-    let url = url::Url::parse(RELAY_URL).unwrap();
+    let mut nostr_ws = NostrRelay::new().await;
 
-    // Connect to the server
-    let (ws_stream, _) = connect_async(url).await.expect("Failed to connect");
-    println!("Connected to the server");
+    // Create prompt filters and send them to the server
+    let prompt_filters = json!({ "kinds": [20020]});
+    nostr_ws.subscribe(prompt_filters).await.expect("Failed to subscribe");
 
-    // Split the WebSocket into a sender and receiver half
-    let (mut write, mut read) = ws_stream.split();
-
-    // Create prompt filters
-    let prompt_filters = json!({
-        "kinds": [20020]
-    });
-
-    write
-        .send(NostrSubscription::new(prompt_filters))
-        .await
-        .expect("Failed to send JSON");
 
     loop {
-        match read.next().await {
+        match nostr_ws.read_notes().await {
             Some(message) => match message {
                 Ok(Message::Text(message)) => {
-                    if let Ok((_type, _id, note)) = from_str::<(String, String, Value)>(&message) {
-                        let nostr_note = SignedNote::read_new(note).unwrap_or_else(|e| {
-                            println!("Error reading note: {:?}", e);
-                            panic!();
-                        });
+                    if let Ok((_type, _id, note)) = 
+                        from_str::<(String, String, SignedNote)>(&message) {
 
-                        println!("Passenger wants to prepay {:?}", nostr_note);
+                            let retrieved_contract = 
+                                RideContract::find_contract(note.content).await;
 
-                        let retrieved_contract = RideContract::find_contract(nostr_note.content).await;
+                            tokio::spawn(async move {
+                                match retrieved_contract.handle_ride_payments().await {
+                                    Ok(()) => {
+                                        println!("Starting to listen");
+                                    },
+                                    Err(e) => {
+                                        println!("Error connecting to LND {:?}", e);
+                                    }
+                                } 
+                            });
+                        }
 
-                        println!("Retrieved contract: {:?}", retrieved_contract);
+                    // ERROR AND NOTICE HANDLERS
+                    else if let Ok((notice, id)) = from_str::<(String, String)>(&message) {
+                        println!("Received notice: {} {}", notice, id);
 
-                        // IF we find a contract, start listening for the prepayment
-
-
-                    } else {
-                        println!("Received relay message: {}", message);
+                    }
+                    else  {
+                        println!("Received relay message");
                     }
                 }
 
@@ -68,8 +54,6 @@ async fn connect_and_reconnect() {
             },
             None => {
                 println!("Connection closed");
-                connect_and_reconnect().await;
-                break;
             }
         }
     }
