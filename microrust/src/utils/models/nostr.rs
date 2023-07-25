@@ -14,7 +14,7 @@ use super::secrets::RELAY_URL;
 pub struct NostrRelay {
     _url: Arc<str>,
     ws_write: Arc<Mutex<SplitSink<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>, WsMessage>>>,
-    notes_receiver: UnboundedReceiver<Result<WsMessage, TungsteniteError>>,
+    notes_receiver: tokio::sync::Mutex<UnboundedReceiver<Result<WsMessage, TungsteniteError>>>,
 }
 
 impl NostrRelay {
@@ -40,7 +40,7 @@ impl NostrRelay {
             NostrRelay {
                 _url: Arc::from(url),
                 ws_write: Arc::new(Mutex::new(ws_write)),
-                notes_receiver: rx,
+                notes_receiver: tokio::sync::Mutex::new(rx),
             } } else {
                 panic!("Failed to connect to Nostr Relay");
             }
@@ -67,7 +67,9 @@ impl NostrRelay {
         spawn_blocking(move || {
             let mut write = ws_stream.lock().unwrap();
             match tokio::runtime::Handle::current().block_on(write.send(note.prepare_ws_message())) {
-                Ok(_) => (),
+                Ok(_) => {
+                    ()
+                },
                 Err(e) => {
                     println!("Error sending note to relay: {:?}", e);
                 }
@@ -75,8 +77,9 @@ impl NostrRelay {
         });
     }
 
-   pub async fn read_notes(&mut self) -> Option<Result<WsMessage, TungsteniteError>> {
-        self.notes_receiver.recv().await
+    pub async fn read_notes(&self) -> Option<Result<WsMessage, TungsteniteError>> {
+        let mut lock = self.notes_receiver.lock().await;
+        lock.recv().await
     }
 
    pub async fn close(&self) -> Result<(), Box<dyn std::error::Error>> {

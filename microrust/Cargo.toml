@@ -17,6 +17,10 @@ path = "src/contract_creator.rs"
 name = "listener"
 path = "src/contract_listener.rs"
 
+[[bin]]
+name = "settler"
+path = "src/contract_settler.rs"
+
 [dependencies]
 tokio = { version = "1.28.0", features = ["full"] }
 tokio-tungstenite = {version = "0.18.0", features = ["native-tls"]}

@@ -2,12 +2,10 @@ use base64::{engine::general_purpose, Engine as _};
 use rand::{thread_rng, Rng};
 use reqwest::header::{HeaderMap, HeaderValue};
 use crate::models::{
-    lightning::{HTLCRequest, HTLCResponse, InvoiceRequest, InvoiceResponse },
+    lightning::{HTLCRequest, HTLCResponse, InvoiceRequest, InvoiceResponse, HtlcCancelRequest, PaymentRequest, PaymentResponse, HTLCSettleRequest },
     secrets::{MACAROON_PATH, REST_HOST}, 
 };
-
-
-use std::{sync::{Arc, Mutex}};
+use std::sync::{Arc, Mutex};
 use httparse::{Header, Request};
 use futures_util::{StreamExt, SinkExt, stream::SplitSink};
 use tokio::sync::mpsc::{UnboundedReceiver, unbounded_channel};
@@ -21,7 +19,7 @@ pub async fn get_invoice(value: u64) -> Result<InvoiceResponse, Box<dyn std::err
         "Grpc-Metadata-macaroon",
         // HeaderValue::from_str(&hex::encode(fs::read(MACAROON_PATH)?))?,
         HeaderValue::from_static(MACAROON_PATH),
-    );
+        );
     let client = reqwest::Client::builder()
         .danger_accept_invalid_certs(true)
         .default_headers(headers)
@@ -43,7 +41,7 @@ pub async fn get_htlc_invoice(
     value: u64,
     hash: String,
     expiry: u64,
-) -> Result<HTLCResponse, Box<dyn std::error::Error>> {
+    ) -> Result<HTLCResponse, Box<dyn std::error::Error>> {
 
     let request_body = HTLCRequest {
         value,
@@ -57,7 +55,7 @@ pub async fn get_htlc_invoice(
         "Grpc-Metadata-macaroon",
         // HeaderValue::from_str(&hex::encode(fs::read(MACAROON_PATH)?))?,
         HeaderValue::from_static(MACAROON_PATH),
-    );
+        );
     let client = reqwest::Client::builder()
         .danger_accept_invalid_certs(true)
         .default_headers(headers)
@@ -81,6 +79,113 @@ pub async fn get_htlc_invoice(
             println!("Error getting invoice: {:?}", e);
             Err(Box::new(e))
         }
+    }
+}
+
+
+pub async fn cancel_htlc_invoice(
+    payment_hash: String,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+    let request_body = HtlcCancelRequest { payment_hash };
+
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        "Grpc-Metadata-macaroon",
+        HeaderValue::from_static(MACAROON_PATH),
+        );
+
+    let client = reqwest::Client::builder()
+        .danger_accept_invalid_certs(true)
+        .default_headers(headers)
+        .build()?;
+
+    let response = client
+        .post(&format!("https://{}/v2/invoices/cancel", REST_HOST))
+        .json(&request_body)
+        .send()
+        .await?;
+
+    if response.status().is_success() {
+        Ok(())
+    } else {
+        let status = response.status();
+        let text = response.text().await.unwrap_or_default();
+        Err(Box::new(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!("Request failed with {}: {}", status, text),
+                    )))
+    }
+}
+
+pub async fn pay_invoice(invoice: String) -> Result<String, Box<dyn std::error::Error + Send>> {
+    let mut headers = HeaderMap::new();
+    let request_body = PaymentRequest::new(invoice);
+    headers.insert(
+        "Grpc-Metadata-macaroon",
+        HeaderValue::from_static(MACAROON_PATH),
+        );
+
+    let client = reqwest::Client::builder()
+        .danger_accept_invalid_certs(true)
+        .default_headers(headers)
+        .build()
+        .unwrap();
+
+    let response = client
+        .post(&format!("https://{}/v1/channels/transactions", REST_HOST))
+        .json(&request_body)
+        .send()
+        .await
+        .unwrap();
+
+    match response.text().await {
+        Ok(body) => match serde_json::from_str::<PaymentResponse>(&body){
+            Ok(payment) => {
+                println!("payment: {:?}", payment);
+                Ok(payment.payment_preimage)
+            },
+            Err(_e) => {
+                println!("Error parsing invoice response: {:?}", body);
+                Err(Box::new(_e))
+            }
+        },
+        Err(e) => {
+            println!("Error getting invoice: {:?}", e);
+            Err(Box::new(e))
+        }
+    }
+}
+
+pub async fn settle_htlc(preimage: String) -> Result<(), Box<dyn std::error::Error + Send>> {
+    let request_body = HTLCSettleRequest { preimage };
+
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        "Grpc-Metadata-macaroon",
+        HeaderValue::from_static(MACAROON_PATH),
+        );
+
+    let client = reqwest::Client::builder()
+        .danger_accept_invalid_certs(true)
+        .default_headers(headers)
+        .build()
+        .unwrap();
+    let response = client
+        .post(&format!("https://{}/v2/invoices/settle", REST_HOST))
+        .json(&request_body)
+        .send()
+        .await
+        .unwrap();
+
+    if response.status().is_success() {
+        Ok(())
+    } else {
+        let status = response.status();
+        let text = response.text().await.unwrap_or_default();
+        Err(Box::new(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!("Request failed with {}: {}", status, text),
+                    )))
     }
 }
 
@@ -166,7 +271,13 @@ impl LndWebSocket {
 
             tokio::spawn(async move {
                 while let Some(message) = ws_read.next().await {
-                    state_sender.send(message).unwrap();
+                    match state_sender.send(message) {
+                        Ok(_) => {}
+                        Err(e) => {
+                            println!("Error sending message: {:?}", e);
+                            break;
+                        }
+                    }
                 }
             });
 
