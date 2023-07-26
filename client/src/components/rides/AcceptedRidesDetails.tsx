@@ -29,9 +29,9 @@ export const AcceptedRideDetails = () => {
 
   return (
     <>
-      <div className="fixed top-0 ml-16 mt-4 flex items-center justify-center z-10">
+      <div className="fixed top-20 mx-8 flex items-center justify-center z-10">
         <div className="flex flex-col items-center justify-center rounded-lg opacity-90">
-          <div className="flex w-72 flex-col justify-center rounded-xl bg-light bg-clip-border text-white shadow-md">
+          <div className="flex w-72 flex-col justify-center rounded-xl bg-light border-2 border-white text-white shadow-md">
             <div className="p-2">
               <h2 className="mb-2 block font-semibold leading-snug tracking-normal text-white text-base antialiased">
                 Accepted Ride
@@ -44,9 +44,9 @@ export const AcceptedRideDetails = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-4 ml-4  flex items-center justify-center z-10">
+      <div className="fixed bottom-0 m-8  flex items-center justify-center z-10">
         <div className="flex flex-col items-center justify-center rounded-lg opacity-90">
-          <div className="flex w-72 flex-col justify-center rounded-xl bg-light bg-clip-border text-white shadow-md">
+          <div className="flex w-72 flex-col justify-center rounded-xl bg-light border-2 border-white text-white shadow-md">
             <div className="p-2">
               <div className="mr-8 inline-block">
                 <h3 className="">Distance</h3>
@@ -68,12 +68,12 @@ export const AcceptedRideDetails = () => {
       </div>
       <FontAwesomeIcon
         icon={faXmark}
-        className="fixed top-14 left-0 z-[1000000] m-4 h-6 w-6 cursor-pointer rounded-full bg-red-700 p-2 font-bold text-white hover:bg-red-800"
-        onClick={() => cancelPayment(contract?.getInvoice()!, currentUser)}
+        className="fixed top-0 left-20 z-[1000000] m-4 h-6 w-6 cursor-pointer rounded-full bg-red-700 p-2 font-bold text-white hover:bg-red-800"
+        onClick={() => cancelPayment(contract?.getContractId()!, currentUser)}
       />
       {profile ? (
         <PassengerProfileCard
-          className="fixed bottom-36 z-[1000001] ml-4"
+          className="fixed bottom-40 z-[1000001] ml-8"
           profile={profile}
         />
       ) : null}

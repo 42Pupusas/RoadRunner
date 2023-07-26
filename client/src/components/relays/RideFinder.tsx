@@ -33,7 +33,7 @@ const MyRideFinder = () => {
       {ride ? null : (
         <FontAwesomeIcon
           icon={faArrowsRotate}
-          className="fixed top-14 left-0  z-[1000000] m-4 h-6 w-6 cursor-pointer rounded-full bg-light p-2 text-white hover:bg-dark"
+          className="fixed top-0 left-20  z-[1000000] m-4 h-6 w-6 cursor-pointer rounded-full bg-light p-2 border border-white text-white hover:bg-dark"
           onClick={() => {
             setRefresh(true);
           }}

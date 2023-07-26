@@ -23,6 +23,10 @@ main {
 p {
   @apply select-none text-text text-sm font-nexab sm:text-base
 }
+
+input {
+    @apply font-nexa px-1
+}
 span {
   @apply text-white font-nexa text-sm
 }

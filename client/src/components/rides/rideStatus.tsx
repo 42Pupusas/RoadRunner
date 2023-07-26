@@ -15,25 +15,25 @@ export const ContractStatus = () => {
 
   return (
     <>
-      <div className="fixed bottom-0 z-[1000001] m-4">
-        <div className="rounded-lg bg-light p-2">
+      <div className="fixed bottom-0 z-[1000001] m-8">
+        <div className="rounded-lg bg-light border-2 border-white p-2">
           <h3>Accepted Ride</h3>
           <span>Your driver should be on his way!</span>
         </div>
         <div className="flex flex-row">
-          <div className="my-2 rounded-lg bg-light p-2">
+          <div className="my-2 rounded-lg bg-light border-2 border-white p-2">
             <h3>Driver Offer</h3>
             <span> {getinvoiceAmount(contract?.getHTLC()!)} sats</span>
           </div>
           <FontAwesomeIcon
             icon={faBoltLightning}
-            className="m-2 h-11 w-11 rounded-full bg-light p-3 text-yellow-500  hover:bg-dark"
-            onClick={() => payDriver(contract?.getInvoice()!, currentUser)}
+            className="m-2 h-11 w-11 rounded-full bg-light p-3 border-2 border-white text-yellow-500  hover:bg-dark"
+            onClick={() => payDriver(contract?.getContractId()!, currentUser)}
           />
           <FontAwesomeIcon
             icon={faXmark}
-            className="m-2 h-11 w-11 cursor-pointer rounded-full bg-red-700 p-3 text-white hover:bg-red-800"
-            onClick={() => cancelPayment(contract?.getInvoice()!, currentUser)}
+            className="m-2 h-11 w-11 cursor-pointer rounded-full bg-red-700 border-2 border-white p-3 text-white hover:bg-red-800"
+            onClick={() => cancelPayment(contract?.getContractId()!, currentUser)}
           />
         </div>
       </div>

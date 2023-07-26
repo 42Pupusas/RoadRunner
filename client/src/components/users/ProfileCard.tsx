@@ -19,7 +19,7 @@ export const DriverProfileCard = (props: ProfileCardProps) => {
   return (
     <>
       <div className={className}>
-        <div className="flex flex-row rounded-lg bg-light p-2 opacity-90">
+        <div className="flex flex-row rounded-lg bg-light border-2 border-white p-2 opacity-90">
           <div>
             <h3 className="font-nexab text-base">{profile.getUsername()}</h3>
             <h4 className="">{profile.getCar()}</h4>
@@ -48,7 +48,7 @@ export const PassengerProfileCard = (props: ProfileCardProps) => {
   return (
     <>
       <div className={className}>
-        <div className="relative p-2 flex w-full max-w-[26rem] flex-col rounded-xl bg-light bg-clip-border shadow-none">
+        <div className="relative p-2 flex w-full max-w-[26rem] flex-col rounded-xl bg-light border-2 border-white shadow-none">
           <div className="relative flex items-center gap-4 overflow-hidden rounded-xl bg-transparent bg-clip-border shadow-none">
             <img
               src={profile.getAvatar()!}

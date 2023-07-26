@@ -16,7 +16,7 @@ const Index = () => {
   const {user, logout} = useContext(UserContext)!;
 
   return (
-    <div className="flex flex-col items-center justify-center m-4">
+    <div className="flex flex-col items-center justify-center m-8 mt-20">
       <div>
         <title>RoadRunner</title>
       </div>

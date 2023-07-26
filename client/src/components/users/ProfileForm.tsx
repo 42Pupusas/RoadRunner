@@ -36,30 +36,30 @@ export const ProfileForm = () => {
       </p>
       <br />
       <div className="flex flex-row space-x-4">
-        <div>
-          <h3>Username</h3>
+        <div className="space-y-8">
           <input
-            className="text-black placeholder:text-black"
+            className="text-black border border-black border-t-transparent border-l-transparent border-r-transparent outline outline-0 placeholder:text-black"
             type="text"
+            placeholder='Username'
             ref={username}
           />
-          <h3>Avatar</h3>
           <input
             type="text"
+            placeholder='Avatar URL'
             ref={avatar}
-            className="text-black placeholder:text-black"
+            className="text-black border border-black border-t-transparent border-l-transparent border-r-transparent outline outline-0 placeholder:text-black"
           />
-          <h3>Car</h3>
           <input
+            className="text-black border border-black border-t-transparent border-l-transparent border-r-transparent outline outline-0 placeholder:text-black"
             type="text"
+            placeholder='Car Model'
             ref={car}
-            className="text-black placeholder:text-black"
           />
-          <h3>Car Avatar</h3>
           <input
+            className="text-black border border-black border-t-transparent border-l-transparent border-r-transparent outline outline-0 placeholder:text-black"
             type="text"
+            placeholder='Car Avatar URL'
             ref={carAvatar}
-            className="text-black placeholder:text-black"
           />
         </div>
         <FontAwesomeIcon

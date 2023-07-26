@@ -39,9 +39,9 @@ const RideFeed = () => {
 
   return (
     <>
-      <div className="fixed top-0 ml-16 mt-4 flex items-center justify-center z-10">
+      <div className="fixed top-20 ml-8 flex items-center justify-center z-10">
         <div className="flex flex-col items-center justify-center rounded-lg opacity-90">
-          <div className="flex w-72 flex-col justify-center rounded-xl bg-light bg-clip-border text-white shadow-md">
+          <div className="flex w-72 flex-col justify-center rounded-xl bg-light border border-2 border-white text-white shadow-md">
             <div className="p-2">
               <h2 className="mb-2 block font-semibold leading-snug tracking-normal text-white text-base antialiased">
                 Nearby Rides
@@ -56,7 +56,7 @@ const RideFeed = () => {
       <div className="fixed inset-0">
         <MapContainer
           center={[13.699111631482895, -89.19175862340873]}
-          zoom={10}
+          zoom={8}
           scrollWheelZoom={true}
           zoomControl={false}
           style={{ width: "100%", height: "100%" }}
