@@ -1,13 +1,9 @@
 import "leaflet/dist/leaflet.css";
 
-// import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
-// import 'leaflet-defaulticon-compatibility';
 import { faFlag } from "@fortawesome/free-regular-svg-icons";
 import {
-    faBoltLightning,
     faFlagCheckered,
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useRef, useState } from "react";
 import { MapContainer, TileLayer, ZoomControl } from "react-leaflet";
 
@@ -19,6 +15,7 @@ import { UserContext } from "../utils/contextproviders/UserContext";
 import AddressMarker from "./AddressMarker";
 import { LatLng } from "leaflet";
 import AddressInputComponent from "../rides/AddressInput";
+import { ReactSVG } from "react-svg";
 
 function RideForm() {
     const currentUser = useContext(UserContext)!.user;
@@ -80,6 +77,7 @@ function RideForm() {
         );
         // Enviamos el viaje al relay de Nostr
         newRide.sendRideRequest(currentUser).then((rideId) => {
+            console.log("Ride ID: ", rideId);
             newRide.setRideID(rideId);
             setRide(newRide);
         });
@@ -136,7 +134,7 @@ function RideForm() {
                     </MapContainer>
                 </div>
 
-                <div className="fixed top-0 mx-8 mt-20 flex items-center justify-center z-10">
+                <div className="fixed top-4 mt-20 flex items-center justify-center z-10">
                     <div className="flex flex-col items-center justify-center rounded-lg opacity-90">
                         <div className="flex w-72 flex-col justify-center rounded-xl bg-light border border-2 border-white text-white shadow-xl">
                             <div className="p-2">
@@ -183,10 +181,10 @@ function RideForm() {
 
                                         />
                                     </div>
-                                    <FontAwesomeIcon
-                                        icon={faBoltLightning}
+                                    <ReactSVG
+                                        src="/buttons/simple/lightning.svg"
                                         onClick={sendRideToRelay}
-                                        className="inline-block h-6 w-6 cursor-pointer rounded-full bg-white p-1 text-yellow-400 hover:bg-dark hover:text-white"
+                                        className=" h-8 w-8 cursor-pointer rounded-full border border-white p-1 hover:bg-dark"
                                     />
                                 </div>
                             </div>

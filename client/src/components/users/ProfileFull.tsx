@@ -24,7 +24,7 @@ export const ProfileFull = () => {
 
   return (
     <>
-      <div className="relative flex max-w-[12rem] flex-col rounded-xl bg-white bg-clip-border  shadow-md">
+      <div className="relative flex max-w-[16rem] flex-col rounded-xl bg-white bg-clip-border  shadow-md">
         <div className="relative m-0 overflow-hidden rounded-none bg-transparent bg-clip-border shadow-none">
           <img src={profile?.getAvatar()!} alt="car avatar" />
         </div>

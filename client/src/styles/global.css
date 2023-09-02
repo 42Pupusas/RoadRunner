@@ -1,49 +1,45 @@
 @tailwind base;
 
-
 button {
-  @apply font-nexab text-xs m-2 rounded py-1 px-3 h-fit bg-white w-fit border border-dark 
+    @apply font-nexab text-xs m-2 rounded py-1 px-3 h-fit bg-white w-fit border border-dark;
 }
 
 form {
-  @apply appearance-none
+    @apply appearance-none;
 }
 h2 {
-  @apply select-none text-dark text-lg font-nexab md:text-xl
+    @apply select-none text-dark text-lg font-nexab md:text-xl;
 }
 h3 {
-  @apply select-none text-black font-nexab text-sm
+    @apply select-none text-black font-nexab text-sm;
 }
 h4 {
-  @apply select-none font-nexab text-white text-sm
+    @apply select-none font-nexab text-white text-sm;
 }
 main {
-  @apply p-2 h-screen w-screen
+    @apply p-2 h-screen w-screen;
 }
 p {
-  @apply select-none text-text text-sm font-nexab sm:text-base
+    @apply select-none text-text text-sm font-nexab sm:text-base;
 }
 
 input {
-    @apply font-nexa px-1
+    @apply font-nexa px-1;
 }
 span {
-  @apply text-white font-nexa text-sm
+    @apply text-white text-sm;
 }
 svg {
-  @apply cursor-pointer
-}
-a > svg {
-  @apply w-6 h-6 text-white m-1 hover:text-light
+    @apply cursor-pointer;
 }
 @tailwind components;
 @tailwind utilities;
 @font-face {
-  font-family: "NexaBold";
-  src: url("./NexaBold.otf");
+    font-family: "NexaBold";
+    src: url("./NexaBold.otf");
 }
 
 @font-face {
-  font-family: "Nexa";
-  src: url("./NexaLight.otf");
+    font-family: "Nexa";
+    src: url("./NexaLight.otf");
 }

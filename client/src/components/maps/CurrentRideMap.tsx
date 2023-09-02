@@ -38,15 +38,22 @@ const CurrentRideMap = () => {
             <>
                 <FontAwesomeIcon
                     icon={faXmark}
-                    className="fixed top-0 left-20 z-[1000000] m-4 h-6 w-6 cursor-pointer rounded-full bg-red-700 p-2 font-bold text-white hover:bg-red-800"
+                    className="fixed top-0 right-0 z-[1000000] m-4 h-8 w-8 cursor-pointer rounded-full border-2 border-white bg-red-600 p-1 font-bold text-white hover:bg-red-800"
                     onClick={async () => {
-
                         // Enviamos un viaje vacio para borrar el completo
-                        const emptyRide = new NostrEvent('', 10420, currentUser!.getPublicKey(), []);
-                        const signedEmptyRide: NostrEvent = await currentUser!.signEvent(emptyRide);
+                        const emptyRide = new NostrEvent(
+                            "",
+                            10420,
+                            currentUser!.getPublicKey(),
+                            []
+                        );
+                        const signedEmptyRide: NostrEvent =
+                            await currentUser!.signEvent(emptyRide);
                         const relayConnection = new WebSocket(RELAY_URL);
                         relayConnection.onopen = () => {
-                            relayConnection.send(signedEmptyRide.getNostrEvent());
+                            relayConnection.send(
+                                signedEmptyRide.getNostrEvent()
+                            );
                             relayConnection.close();
                         };
 
@@ -57,7 +64,7 @@ const CurrentRideMap = () => {
                 />
             </>
 
-            <div className="fixed top-0 m-8 mt-20 flex items-center justify-center z-10">
+            <div className="fixed flex items-center justify-center z-10">
                 <div className="flex flex-col items-center justify-center rounded-lg opacity-90">
                     <div className="flex w-72 flex-col justify-center rounded-xl bg-light border border-2 border-white text-white shadow-2xl">
                         <div className="p-2">
@@ -70,7 +77,9 @@ const CurrentRideMap = () => {
                             <div className="">
                                 <div className="mr-12 inline-block">
                                     <h3 className="">Distance</h3>
-                                    <h4>{ride?.getDistanceInKm().toFixed(2)} kms</h4>
+                                    <h4>
+                                        {ride?.getDistanceInKm().toFixed(2)} kms
+                                    </h4>
                                 </div>
 
                                 <div className="inline-block">
@@ -96,8 +105,14 @@ const CurrentRideMap = () => {
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                     <ZoomControl position="bottomright" />
 
-                    <Marker position={ride?.getRideFrom()!} icon={startFlag}></Marker>
-                    <Marker position={ride?.getRideTo()!} icon={endFlag}></Marker>
+                    <Marker
+                        position={ride?.getRideFrom()!}
+                        icon={startFlag}
+                    ></Marker>
+                    <Marker
+                        position={ride?.getRideTo()!}
+                        icon={endFlag}
+                    ></Marker>
                 </MapContainer>
             </div>
         </>

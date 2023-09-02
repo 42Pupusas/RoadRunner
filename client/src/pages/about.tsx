@@ -1,25 +1,36 @@
+import Link from "next/link";
+import { ReactSVG } from "react-svg";
+
 const About = () => {
     return (
         <>
-            <div className="m-12 mt-20 flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center">
                 <div>
                     <title>About - RoadRunner</title>
                 </div>
-                <div className="p-2">
+                <div>
+                    <Link href="/">
+                        <ReactSVG
+                            src="/buttons/simple/home-white.svg"
+                            className="fixed right-0 top-0 m-8 h-12 w-12 cursor-pointer rounded-full bg-light p-2 border border-white text-white hover:bg-dark"
+                        />
+                    </Link>
+
                     <div className="space-y-2">
                         <h2>Mission</h2>
                         <p>
-                            RoadRunner leverages decentralized technologies like Nostr and BTC
-                            as a first step to decentralize ride sharing services.
+                            RoadRunner leverages decentralized technologies like
+                            Nostr and BTC as a first step to decentralize ride
+                            sharing services.
                         </p>
 
                         <p>
-                            Our mission is NOT to become the largest ride sharing service out
-                            there.
+                            Our mission is NOT to become the largest ride
+                            sharing service out there.
                         </p>
                         <p>
-                            Our goal is to allow ANYONE in the world to run their own ride
-                            sharing service.
+                            Our goal is to allow ANYONE in the world to run
+                            their own ride sharing service.
                         </p>
                         <p className="font-bold">
                             Keep in mind this site is still under contruction!
@@ -74,10 +85,14 @@ const About = () => {
                                 </p>
                                 <ul className="overflow-scroll h-12 text-xs">
                                     <li>
-                                        <a href="https://coinpages.io/">Coinpages</a>
+                                        <a href="https://coinpages.io/">
+                                            Coinpages
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href="https://coinfinity.co/">Coinfinity</a>
+                                        <a href="https://coinfinity.co/">
+                                            Coinfinity
+                                        </a>
                                     </li>
                                     <li>
                                         <a href="https://www.lesfemmesorange.work/">
@@ -85,13 +100,19 @@ const About = () => {
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="https://terahash.space/">Terahash</a>
+                                        <a href="https://terahash.space/">
+                                            Terahash
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href="https://the-burgery.de/">The Burgery</a>
+                                        <a href="https://the-burgery.de/">
+                                            The Burgery
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href="https://business-bitcoin.de/">Business Bitcoin</a>
+                                        <a href="https://business-bitcoin.de/">
+                                            Business Bitcoin
+                                        </a>
                                     </li>
                                     <li>
                                         <a href="https://www.lilienschaenke-sportsbar.de">
@@ -99,25 +120,39 @@ const About = () => {
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="https://www.seedor.io/">Seedor</a>
+                                        <a href="https://www.seedor.io/">
+                                            Seedor
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href="https://hotel-princess.de/">Hotel Princess</a>
+                                        <a href="https://hotel-princess.de/">
+                                            Hotel Princess
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href="https://pocketbitcoin.com/">Pocket Bitcoin</a>
+                                        <a href="https://pocketbitcoin.com/">
+                                            Pocket Bitcoin
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href="https://bitbox.swiss/es/">BitBox</a>
+                                        <a href="https://bitbox.swiss/es/">
+                                            BitBox
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href="https://einundzwanzig.space/">Einundzwanzig</a>
+                                        <a href="https://einundzwanzig.space/">
+                                            Einundzwanzig
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href="https://copiaro.de/">Copiaro</a>
+                                        <a href="https://copiaro.de/">
+                                            Copiaro
+                                        </a>
                                     </li>
                                     <li>
-                                        <a href="https://konsensus.network/">Konsensus Network</a>
+                                        <a href="https://konsensus.network/">
+                                            Konsensus Network
+                                        </a>
                                     </li>
                                     <li>
                                         <a href="https://einundzwanzig.space/gesundes-geld/">
@@ -139,8 +174,8 @@ const About = () => {
                         We are a very small, independent team from El Salvador.
                     </p>
                     <p>
-                        If you like this project, you can donate to the following BTC
-                        address:
+                        If you like this project, you can donate to the
+                        following BTC address:
                     </p>
                     <span className="select-all text-xs uppercase text-black sm:text-sm">
                         bc1qrzsuac0n0kkwzs24rq5p3nf0uh2zpq86er55cs

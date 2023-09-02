@@ -1,14 +1,14 @@
-import { useCallback, useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect } from "react";
 
-import { RELAY_URL } from '@/components/utils/Utils';
-import { Subscription } from '@/models/nostr/Subscription';
-import { Contract } from '@/models/roadrunner/Contract';
+import { RELAY_URL } from "@/components/utils/Utils";
+import { Subscription } from "@/models/nostr/Subscription";
+import { Contract } from "@/models/roadrunner/Contract";
 
-import { ContractContext } from '../utils/contextproviders/ContractContext';
-import OfferHistoryContext from '../utils/contextproviders/OfferHistoryContext';
-import { RideContext } from '../utils/contextproviders/RideContext';
-import { UserContext } from '../utils/contextproviders/UserContext';
-import { NostrEvent } from '@/models/nostr/Event';
+import { ContractContext } from "../utils/contextproviders/ContractContext";
+import OfferHistoryContext from "../utils/contextproviders/OfferHistoryContext";
+import { RideContext } from "../utils/contextproviders/RideContext";
+import { UserContext } from "../utils/contextproviders/UserContext";
+import { NostrEvent } from "@/models/nostr/Event";
 
 // Conexion del pasajero al relay de Nostr para recuperar contratos
 // Este componente se carga cuando agregamos un viaje al contexto
@@ -62,8 +62,15 @@ const ContractListener = () => {
         setOfferHistory([]);
 
         // Enviamos un viaje vacio para borrar el completo
-        const emptyRide = new NostrEvent('', 10420, currentUser!.getPublicKey(), []);
-        const signedEmptyRide: NostrEvent = await currentUser!.signEvent(emptyRide);
+        const emptyRide = new NostrEvent(
+            "",
+            10420,
+            currentUser!.getPublicKey(),
+            []
+        );
+        const signedEmptyRide: NostrEvent = await currentUser!.signEvent(
+            emptyRide
+        );
         const relayConnection = new WebSocket(RELAY_URL);
         relayConnection.onopen = () => {
             relayConnection.send(signedEmptyRide.getNostrEvent());
@@ -76,10 +83,9 @@ const ContractListener = () => {
     }, [setContract]);
 
     const handleRideUpdate = useCallback(() => {
-
         const rideSubscription = new Subscription({
             kinds: [4200],
-            '#e': [ride?.getRideId()],
+            "#e": [ride?.getRideId()],
         });
 
         const relayConnection = new WebSocket(RELAY_URL);
@@ -90,47 +96,53 @@ const ContractListener = () => {
             console.log(msg);
             const [type, , nostrEvent] = JSON.parse(msg.data);
 
-            if (type === 'EVENT') {
+            if (type === "EVENT") {
                 const { content, tags, kind, id } = nostrEvent;
 
                 if (kind === 4200) {
                     const { htlc, invoice, status } = JSON.parse(content);
 
-                    if (status === 'settled') {
+                    if (status === "settled") {
                         updateFinishedRide();
                         return;
                     }
 
-                    if (status === 'canceled') {
+                    if (status === "canceled") {
                         updateCanceledRide();
                         return;
                     }
 
-                    if (status === 'offered') {
-                        const rideOffer = { invoice, driver: tags[0][1], contractId: id, htlc };
+                    if (status === "offered") {
+                        const rideOffer = {
+                            invoice,
+                            driver: tags[0][1],
+                            contractId: id,
+                            htlc,
+                        };
                         updateOfferHistory(rideOffer);
                     }
 
-                    if (status === 'accepted') {
+                    if (status === "accepted") {
                         updateRideContract(htlc, invoice, tags[0][1], id);
                     }
                 }
             } else {
-                console.log('Relay says', msg.data);
+                console.log("Relay says", msg.data);
             }
         };
         relayConnection.onopen = async () => {
+            console.log(rideSubscription);
             relayConnection.send(rideSubscription.getNostrEvent());
         };
 
         relayConnection.onclose = () => {
-            console.log('Connection closed');
+            console.log("Connection closed");
         };
 
         return () => {
             relayConnection.close();
         };
-    }, [currentUser, ride]);
+    }, [ride]);
 
     useEffect(() => {
         handleRideUpdate();

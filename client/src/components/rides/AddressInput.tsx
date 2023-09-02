@@ -47,7 +47,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
             <FontAwesomeIcon
                 icon={faQuestion}
                 onClick={handleTextChange}
-                className="h-6 w-6 cursor-pointer rounded-full bg-white p-1 text-dark hover:bg-dark hover:text-white"
+                className="h-6 w-6 cursor-pointer rounded-full border borde-white p-1 text-dark hover:bg-dark hover:text-white"
             />
             {error && (
                 <p className="text-red-500">Error occurred. Please try again.</p>

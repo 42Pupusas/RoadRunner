@@ -67,7 +67,7 @@ const RideOffer = () => {
     return (
         <>
             <div
-                className={`fixed bottom-0 m-8 flex items-center justify-center z-10 transition-all duration-200 ${ride ? "opacity-90" : "opacity-0"
+                className={`fixed bottom-4 flex items-center justify-center z-10 transition-all duration-200 ${ride ? "opacity-90" : "opacity-0"
                     }`}
             >
                 <div className="flex flex-col items-center justify-center rounded-lg opacity-90 space-y-4">

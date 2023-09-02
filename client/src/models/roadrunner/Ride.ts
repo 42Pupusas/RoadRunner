@@ -96,7 +96,7 @@ export class Ride {
         console.log('Sending ride request to Nostr', signedEvent.getNostrEvent());
         relayConnection.send(signedEvent.getNostrEvent());
         relayConnection.close();
-        resolve(newNostrEvent.getNostrId());
+        resolve(signedEvent.getNostrId());
       };
     });
   }

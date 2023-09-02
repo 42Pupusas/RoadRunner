@@ -39,7 +39,7 @@ const RideFeed = () => {
 
   return (
     <>
-      <div className="fixed top-20 ml-8 flex items-center justify-center z-10">
+      <div className="fixed top-24 flex items-center justify-center z-10">
         <div className="flex flex-col items-center justify-center rounded-lg opacity-90">
           <div className="flex w-72 flex-col justify-center rounded-xl bg-light border border-2 border-white text-white shadow-md">
             <div className="p-2">

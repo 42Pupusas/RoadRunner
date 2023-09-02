@@ -1,13 +1,11 @@
-import { faBoltLightning, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faBoltLightning} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import QRCode from "qrcode.react";
 import { useContext, useEffect, useState } from "react";
 
-import { stopPrepay } from "@/models/nostr/Htlc";
 import { findProfileByPublicKey } from "@/models/relays/RideFinder";
 import type { Profile } from "@/models/roadrunner/Profile";
 
-import { DriverProfileCard } from "../users/ProfileCard";
 import { getinvoiceAmount } from "../utils/Bolt11";
 import OfferHistoryContext from "../utils/contextproviders/OfferHistoryContext";
 import { UserContext } from "../utils/contextproviders/UserContext";
@@ -25,7 +23,7 @@ const OfferFeed = () => {
         contractId: string;
         htlc: string;
     } | null>(null);
-    const [currentDriver, setDriver] = useState<Profile | null>(null);
+    const [_currentDriver, setDriver] = useState<Profile | null>(null);
     // Mostramos el recibo del servidor y generamos un QR
     // Tambien notificamos al servidor para que empieze a escuchar el contrato
     const prepayDriverUI = async (offer: {
