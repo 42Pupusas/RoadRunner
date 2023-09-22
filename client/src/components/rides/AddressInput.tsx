@@ -30,24 +30,24 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
     };
 
     return (
-        <div className="flex flex-row space-x-4 items-center">
-            <div className="relative">
+        <div className="flex space-x-4 items-center">
                 <input
                     type="text"
                     value={text}
                     placeholder={title}
                     onChange={handleInputChange}
-                    className="peer font-nexa h-full w-full  
+                    className="peer font-nexa   
                         border border-white border-t-transparent border-l-transparent border-r-transparent 
                         bg-transparent text-sm text-white outline outline-0 
                         px-1 placeholder:text-white"
                 />
-            </div>
 
             <FontAwesomeIcon
                 icon={faQuestion}
                 onClick={handleTextChange}
-                className="h-6 w-6 cursor-pointer rounded-full border borde-white p-1 text-dark hover:bg-dark hover:text-white"
+                className="h-6 w-6 cursor-pointer rounded-full 
+                            border border-light p-1 text-white 
+                            hover:bg-light hover:text-dark"
             />
             {error && (
                 <p className="text-red-500">Error occurred. Please try again.</p>

@@ -27,18 +27,21 @@ export const ProfileForm = () => {
         newProfile.publishProfileEvent(user);
     };
 
+    const deleteProfile = () => {};
+
     return (
         <div className="space-y-4">
             <h2>Edit Profile</h2>
-            <p className="">
+            <p>
                 Keep in mind a new profile event is created every time, no data
                 is persisted from the old one!
             </p>
             <br />
-            <div className="flex space-x-16">
-                <div className="flex flex-col space-y-4">
+            <div className="p-4 flex-col space-y-12">
                     <input
-                        className="text-black border border-black border-t-transparent border-l-transparent border-r-transparent outline outline-0 placeholder:text-black"
+                        className="w-full text-black border border-black border-t-transparent 
+                        border-l-transparent border-r-transparent 
+                        outline outline-0 placeholder:text-black"
                         type="text"
                         placeholder="Username"
                         ref={username}
@@ -47,27 +50,45 @@ export const ProfileForm = () => {
                         type="text"
                         placeholder="Avatar URL"
                         ref={avatar}
-                        className="text-black border border-black border-t-transparent border-l-transparent border-r-transparent outline outline-0 placeholder:text-black"
+                        className="w-2/3 text-black border border-black border-t-transparent 
+                        border-l-transparent border-r-transparent 
+                        outline outline-0 placeholder:text-black"
                     />
+
+                    <p>
+                     Drivers should also fill out the following:
+                    </p>
                     <input
-                        className="text-black border border-black border-t-transparent border-l-transparent border-r-transparent outline outline-0 placeholder:text-black"
+                        className="w-full text-black border border-black border-t-transparent 
+                        border-l-transparent border-r-transparent outline outline-0 
+                        placeholder:text-black"
                         type="text"
                         placeholder="Car Model"
                         ref={car}
                     />
                     <input
-                        className="text-black border border-black border-t-transparent border-l-transparent border-r-transparent outline outline-0 placeholder:text-black"
+                        className="w-2/3 text-black border border-black 
+                        border-t-transparent border-l-transparent border-r-transparent 
+                        outline outline-0 placeholder:text-black"
                         type="text"
                         placeholder="Car Avatar URL"
                         ref={carAvatar}
                     />
-                </div>
-                <FontAwesomeIcon
-                    className="h-8 w-8 cursor-pointer rounded-full bg-light p-2 text-white hover:bg-light"
-                    icon={faIdCard}
-                    onClick={createProfile}
-                />
             </div>
+            <button
+                className="bg-dark text-white p-2 rounded-lg border-0 "
+                onClick={createProfile}
+            >
+             Edit Profile
+            </button>
+            <button
+                className="bg-red-500 text-white p-2 rounded-lg border-0"
+                onClick={deleteProfile}
+            >
+                Delete Profile
+            </button>
+
+
         </div>
     );
 };

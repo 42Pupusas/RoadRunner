@@ -5,7 +5,7 @@ use crate::models::{
     lightning::{HTLCRequest, HTLCResponse, InvoiceRequest, InvoiceResponse, HtlcCancelRequest, PaymentRequest, PaymentResponse, HTLCSettleRequest },
     secrets::{MACAROON_PATH, REST_HOST}, 
 };
-use std::sync::{Arc, Mutex};
+use std::{sync::{Arc, Mutex}, fs};
 use httparse::{Header, Request};
 use futures_util::{StreamExt, SinkExt, stream::SplitSink};
 use tokio::sync::mpsc::{UnboundedReceiver, unbounded_channel};
@@ -17,8 +17,7 @@ pub async fn get_invoice(value: u64) -> Result<InvoiceResponse, Box<dyn std::err
     let mut headers = HeaderMap::new();
     headers.insert(
         "Grpc-Metadata-macaroon",
-        // HeaderValue::from_str(&hex::encode(fs::read(MACAROON_PATH)?))?,
-        HeaderValue::from_static(MACAROON_PATH),
+        HeaderValue::from_str(&hex::encode(fs::read(MACAROON_PATH)?))?,
         );
     let client = reqwest::Client::builder()
         .danger_accept_invalid_certs(true)
@@ -53,8 +52,7 @@ pub async fn get_htlc_invoice(
     let mut headers = HeaderMap::new();
     headers.insert(
         "Grpc-Metadata-macaroon",
-        // HeaderValue::from_str(&hex::encode(fs::read(MACAROON_PATH)?))?,
-        HeaderValue::from_static(MACAROON_PATH),
+        HeaderValue::from_str(&hex::encode(fs::read(MACAROON_PATH)?))?,
         );
     let client = reqwest::Client::builder()
         .danger_accept_invalid_certs(true)
@@ -91,7 +89,7 @@ pub async fn cancel_htlc_invoice(
     let mut headers = HeaderMap::new();
     headers.insert(
         "Grpc-Metadata-macaroon",
-        HeaderValue::from_static(MACAROON_PATH),
+         HeaderValue::from_str(&hex::encode(fs::read(MACAROON_PATH)?))?,
         );
 
     let client = reqwest::Client::builder()
@@ -122,7 +120,7 @@ pub async fn pay_invoice(invoice: String) -> Result<String, Box<dyn std::error::
     let request_body = PaymentRequest::new(invoice);
     headers.insert(
         "Grpc-Metadata-macaroon",
-        HeaderValue::from_static(MACAROON_PATH),
+         HeaderValue::from_str(&hex::encode(fs::read(MACAROON_PATH).unwrap())).unwrap(),
         );
 
     let client = reqwest::Client::builder()
@@ -162,7 +160,7 @@ pub async fn settle_htlc(preimage: String) -> Result<(), Box<dyn std::error::Err
     let mut headers = HeaderMap::new();
     headers.insert(
         "Grpc-Metadata-macaroon",
-        HeaderValue::from_static(MACAROON_PATH),
+         HeaderValue::from_str(&hex::encode(fs::read(MACAROON_PATH).unwrap())).unwrap(),
         );
 
     let client = reqwest::Client::builder()
@@ -214,8 +212,8 @@ impl LndWebSocket {
             );
 
         // Prepare the headers
-        let macaroon = MACAROON_PATH;
-        // let macaroon = fs::read_to_string(macaroon_path)?;
+        // let macaroon = MACAROON_PATH;
+        let macaroon = hex::encode(fs::read(MACAROON_PATH).unwrap());
         let random_key = generate_random_key();
 
         let mut headers = [

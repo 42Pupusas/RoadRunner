@@ -1,9 +1,7 @@
 import "leaflet/dist/leaflet.css";
 
 import { faFlag } from "@fortawesome/free-regular-svg-icons";
-import {
-    faFlagCheckered,
-} from "@fortawesome/free-solid-svg-icons";
+import { faFlagCheckered } from "@fortawesome/free-solid-svg-icons";
 import { useContext, useRef, useState } from "react";
 import { MapContainer, TileLayer, ZoomControl } from "react-leaflet";
 
@@ -134,68 +132,92 @@ function RideForm() {
                     </MapContainer>
                 </div>
 
-                <div className="fixed top-4 mt-20 flex items-center justify-center z-10">
-                    <div className="flex flex-col items-center justify-center rounded-lg opacity-90">
-                        <div className="flex w-72 flex-col justify-center rounded-xl bg-light border border-2 border-white text-white shadow-xl">
-                            <div className="p-2">
-                                <h2 className="mb-2 block font-semibold leading-snug tracking-normal text-white text-base antialiased">
-                                    Ride Request
-                                </h2>
-                                <p className="block font-nexa text-sm font-light leading-relaxed text-inherit antialiased">
-                                    Pick your points on the map and choose a fair price!
+                <div
+                    className="fixed w-fit top-24 left-8 flex items-center 
+                                opacity-90 z-10 rounded-xl bg-dark border 
+                                border-2 border-l-0 border-white text-white 
+                                shadow-xl"
+                >
+                    <div className="p-4 flex-col space-y-2">
+                        <h2
+                            className="block font-semibold leading-snug tracking-normal 
+                                        text-white text-base antialiased"
+                        >
+                            Ride Request
+                        </h2>
+                        {!fromAddress ? (
+                            <>
+                                <p className="font-nexa text-xs sm:text-base font-light leading-relaxed text-inherit antialiased">
+                                    Use the address search to set your ride
+                                    details.
                                 </p>
-                            </div>
-                        </div>
+                                <p className="font-nexa text-xs sm:text-base font-light leading-relaxed text-inherit antialiased">
+                                    Choose your price in sats and send your ride
+                                    request.
+                                </p>
+                                <p className="font-nexa text-xs sm:text-base font-light leading-relaxed text-inherit antialiased">
+                                    Once a driver accepts your request, you will
+                                    be notified.
+                                </p>
+                            </>
+                        ) : (
+                            <></>
+                        )}
                     </div>
                 </div>
 
-                <div className="fixed bottom-0 left-0 m-8 flex items-center justify-center z-10">
-                    <div className=" flex flex-col items-center justify-center  rounded-lg opacity-90 space-y-4">
-                        <div className="flex w-72 flex-col justify-center rounded-xl bg-light border border-2 border-white text-white shadow">
-                            <div className="p-2 space-y-2">
-                                <div>
-                                    <AddressInputComponent
-                                        onTextChange={(from) => {
-                                            setFromAddress(from);
-                                        }}
-                                        title="From"
-                                    />
-                                </div>
-                                <div>
-                                    <AddressInputComponent
-                                        onTextChange={(to) => setToAddress(to)}
-                                        title="To"
-                                    />
-                                </div>
-                                <div className="flex flex-row space-x-4 items-center">
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            inputMode="numeric"
-                                            ref={ridePrice}
-                                            placeholder="Sats"
-                                            className="peer font-nexa h-full w-full  
+                <div className="fixed bottom-8 left-8 z-10 flex space-x-4 items-center">
+                    <div
+                        className="w-fit rounded-xl 
+                                p-4 bg-dark border border-2 border-white 
+                                border-l-0 text-white shadow flex-col space-y-8"
+                    >
+                        <AddressInputComponent
+                            onTextChange={(from) => {
+                                setFromAddress(from);
+                            }}
+                            title="From"
+                        />
+                        {fromAddress ? (
+                            <AddressInputComponent
+                                onTextChange={(to) => setToAddress(to)}
+                                title="To"
+                            />
+                        ) : (
+                            <></>
+                        )}
+                        {fromAddress && toAddress ? (
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                ref={ridePrice}
+                                placeholder="Sats"
+                                className="peer font-nexa h-full w-full  
                                         border border-white border-t-transparent border-l-transparent border-r-transparent 
                                         bg-transparent text-sm text-white outline outline-0 
                                         px-1 placeholder:text-white"
-
-                                        />
-                                    </div>
-                                    <ReactSVG
-                                        src="/buttons/simple/lightning.svg"
-                                        onClick={sendRideToRelay}
-                                        className=" h-8 w-8 cursor-pointer rounded-full border border-white p-1 hover:bg-dark"
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                            />
+                        ) : (
+                            <></>
+                        )}
                     </div>
+                    {fromAddress && toAddress ? (
+                        <ReactSVG
+                            src="/buttons/simple/lightning.svg"
+                            onClick={sendRideToRelay}
+                            className="h-24 w-24 cursor-pointer rounded-full
+                                border-2 border-white p-4 bg-dark hover:bg-light"
+                        />
+                    ) : (
+                        <></>
+                    )}
                 </div>
             </>
 
             <div
-                className={`fixed top-1/2 right-0 m-4 border-l-4 border-orange-500 bg-orange-100 p-1 transition-all duration-200 ${rideError ? "opacity-100" : "opacity-0"
-                    }`}
+                className={`fixed top-1/2 right-0 m-4 border-l-4 border-orange-500 bg-orange-100 p-1 transition-all duration-200 ${
+                    rideError ? "opacity-100" : "opacity-0"
+                }`}
                 role="alert"
             >
                 <h3 className="text-base">Ride Error</h3>
@@ -203,7 +225,9 @@ function RideForm() {
             </div>
             <div
                 className={`fixed top-1/2 right-0 m-4 border-l-4 border-orange-500 bg-orange-100 p-1 
-                            transition-all duration-200 ${userError ? "opacity-100" : "opacity-0"}`}
+                            transition-all duration-200 ${
+                                userError ? "opacity-100" : "opacity-0"
+                            }`}
                 role="alert"
             >
                 <h3 className="text-base">User Error</h3>

@@ -8,7 +8,7 @@ function Settings() {
     return (
         <>
             <div>
-                <title>Settings - RoadRunner</title>
+                <title>Profile - RoadRunner</title>
             </div>
             <div className="flex flex-col items-center justify-center m-4 space-y-8">
                 <ProfileForm />
